@@ -1,6 +1,7 @@
 /*You are driving to school. You look at the clock. The is x minutes to class and
 there is y kilometers left. Program that prints what is average speed (km/h) that
-you get school before start*/
+you get school before start
+-Lauri Vuori*/
 #include<stdio.h>
 
 int main(void){
