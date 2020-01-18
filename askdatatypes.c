@@ -28,11 +28,11 @@ int main(void)
 	printf("What is your shoe size?\n");
 	scanf("%f",&shoesize);
 
-    printf("What is your bank balance?\n");
-    scanf("%f", &bbalance);
+	printf("What is your bank balance?\n");
+	scanf("%f", &bbalance);
 
-    printf("Which street do you live in?\n");
-    scanf("%s", address);
+	printf("Which street do you live in?\n");
+	scanf("%s", address);
 
 	printf("What is your phone number?\n");
 	scanf("%s", pnumber);
