@@ -28,5 +28,7 @@ int find_pair(int *arr, int len, int sum, int *a, int *b)
             }
         }
     }
+    *a=i;
+    *b=z;
     return 0;
 }
