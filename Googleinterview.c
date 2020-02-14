@@ -1,3 +1,13 @@
+/* Find two numbers from Write a C program that will find 
+pair of numbers using the biggest number, that 
+will give the predefined sum
+Array is sorted i accending order, len have size of array
+int find_pair(int *arr, int len, int sum, int *a, int *b);
+Return value:
+0 not found
+1 found, a&b has the array index to numbers*/
+
+
 #include <stdio.h>
 
 
