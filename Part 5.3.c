@@ -3,6 +3,7 @@ Write a C function for sorting the elements in array
 
 void sort_array(int array[]);
 Use constant for defining the size of an array*/
+
 #include <stdlib.h>
 #include <time.h>
 #include <stdio.h>
