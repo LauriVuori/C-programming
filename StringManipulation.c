@@ -28,21 +28,32 @@ void read_file(char s[]);
 void write_file(char s[]);
 void write_string(char s[]);
 
-#define SIZE 100
+char ask_command();
+
+#define SIZE 1000
 int main(void){
+    char s[SIZE] = "";
     char temp[SIZE];
     char command;
-    char s[SIZE] = "asaADS4adLaur";
+    //get string from a file
+    FILE *fp = fopen("WrittenString.txt", "r");       //write file name
+    if (fp == NULL){
+        printf("Error while opening the file. Maybe missing file.\n");
+        printf("Will create new .txt file\n");
+        write_string(s);
+    }
+    else{
+    fgets(s, SIZE, fp);
+    }
+    fclose(fp);
+
 
     display_menu();
 
     int count = 0;
 
     do{
-        printf("\nGive command:\n");
-        fgets(temp, 100, stdin);
-
-        sscanf(temp,"%c", &command);
+        command = ask_command();
 
         switch(command){
         case 'a':
@@ -59,7 +70,7 @@ int main(void){
         case 'd':
             to_lower(s);
         break;
-        case 'E':
+        case 'e':
             print_string(s);
         break;
         case 'f':
@@ -80,23 +91,30 @@ int main(void){
         case 'x':
             printf("Program shuts down");
         break;
+
         }
     }while(command != 'x');
 
-
-
-
-
-/*fprintf(filepointer, "asd %d",variable);
-fclose(filepointer);*/
 }
 
+char ask_command(void){
+        char command;
+        char temp[SIZE];
+        printf("\nGive command:\n");
+        fgets(temp, SIZE, stdin);
+        sscanf(temp, "%c", &command);
+
+        if(command >= 'A' && command <= 'Z' ){
+            command = command + 32;
+        }
+        return command;
+}
 void display_menu(void){
     printf("A) Count the number of vowels in the string\nB) Count the number of consonants in the string\nC) Convert the string to uppercase\nD) Convert the string to lowercase");
     printf("\nE) Display the current string\nF) Enter another string\nG) Read string from file\nH) Write string to file\n\nM) Display this menu\nX) Exit the program");
 }
 
-count_vowels(char s[]){
+int count_vowels(char s[]){
 
     int i;
     int counter = 0;
@@ -144,7 +162,7 @@ void to_upper(char s[]){
             s[i] -= 32;
         }
     }
-printf("%s", s);
+printf("String converted to upper: %s", s);
 }
 
 void to_lower(char s[]){
@@ -152,9 +170,9 @@ void to_lower(char s[]){
     for(i = 0; s[i] != '\0'; i++){
         if(s[i] >= 'A' && s[i] <= 'Z'){
             s[i] += 32;
-        }
+            }
     }
-printf("%s", s);
+printf("String converted to lower: %s", s);
 }
 
 void print_string(char s[]){
@@ -162,30 +180,32 @@ void print_string(char s[]){
 }
 
 void read_file(char s[]){
-    FILE *fp = fopen("WrittenString.c", "r");       //write file name
+    FILE *fp = fopen("WrittenString.txt", "r");       //write file name
     if (fp == NULL){
-        printf("Error while opening the file.\n");
-        return 0;
+        printf("Error while opening the file. Maybe missing file.\n");
+        printf("Write string to file.\n");
+        write_string(s);
     }
 
     printf("The contents of file are:\n");
+    fgets(s, SIZE, fp);
+    printf("%s", s);
 
-    while((s = fgetc(fp)) != EOF){
-        printf("%c", s);
-    }
     fclose(fp);
 }
 
 void write_file(char s[]){
-    FILE *fp = fopen("WrittenString.c", "w"); //write file name
-    printf("Give new string to file:\n");
-    fgets(s, SIZE, stdin);
+    FILE *fp = fopen("WrittenString.txt", "w"); //write file name
+    //printf("Give new string to file:\n");
+    //fgets(s, SIZE, stdin);
+    printf("String will be written in file:%s", s);
     fprintf(fp, "%s", s);
     fclose(fp);
 }
 
 void write_string(char s[]){
-            printf("Give new string:\n");
-            fgets(s, SIZE, stdin);
-            printf("New string is: %s", s);
+    printf("Give new string:\n");
+    fgets(s, SIZE, stdin);
+    printf("New string is: %s", s);
 }
+
