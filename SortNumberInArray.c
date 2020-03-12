@@ -49,3 +49,4 @@ void sort_array(int array[]){
         printf("%d,", array[i]);
     }
 }
+
