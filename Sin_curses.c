@@ -1,10 +1,10 @@
 
-#include <unistd.h> /* needed for usleep delay*/
 #include <ncurses.h>
-
+#include <unistd.h> /* needed for usleep delay*/
+#include <math.h>
 #define PI 3.14159265
 
-
+void draw_line();
 int main (void){
     int i;
 
@@ -30,33 +30,72 @@ int main (void){
    
     noecho ();			/* stop echo of input */
     //vaakarivi
-    int Horizontal_row = 10;
-    for (i = 0; i < 50; i++){
-        move (Horizontal_row, i);
-        printw("*");
-       usleep(5000);
-
-    }
-    //pystyrivi
-    int Vertical_row = 25;
-    for (i = 0; i < 25; i++){
+    int Horizontal_row = 30;
+    int Vertical_row = 30;
+    for (i = 0; i <= 60; i++){
         move (i, Vertical_row);
         printw("*");
-        usleep(5000);
+        if(i == 25){
+            move(25, Vertical_row+1);
+            printw("5");
+            move(Horizontal_row+1, 25);
+            printw("-5");
+        }
+        else if(i == 20){
+            move(20, Vertical_row+1);
+            printw("10");
+            move(Horizontal_row+1, 20);
+            printw("-10");
 
-    }
-
-    
-
-    /*float x,y;
-    for(x=-3.14159;x<=3.14159;x+=1.0){
-        y = sin(x);
-        move(x, y);
+        }
+        else if(i == 15){
+            move(15, Vertical_row+1);
+            printw("15"); 
+            move(Horizontal_row+1, 15);
+            printw("-15");
+        }
+        else if(i == 30){
+            move(29, Vertical_row+1);
+            printw("0");
+        }
+        else if(i == 35){
+            move(35, Vertical_row+1);
+            printw("-5");
+            move(Horizontal_row+1, 35);
+            printw("5");
+        }
+        else if(i == 40){
+            move(40, Vertical_row+1);
+            printw("-10");
+            move(Horizontal_row+1, 40);
+            printw("10");
+        }
+        else if(i == 45){
+            move(45, Vertical_row+1);
+            printw("-15");
+            move(Horizontal_row+1, 45);
+            printw("15");
+        }
+        move (Horizontal_row, i);
         printw("*");
-        draw_line();
-    }*/
+        refresh();
+        usleep(20000);
+    }
+    move(Horizontal_row, i);
+    printw(">");
+    refresh ();
+    usleep(20000);
+    float x, y, a=25, h= 0, b = 9.5, k=0;
+    for (i = 0; i <= 60; i++){
+        y = a*sin(((i-h)/b)+k);
+        move(y+30, i);
+        printw("0");
+        refresh ();
+        usleep(20000);
+    }
 
     nodelay (stdscr, FALSE);	/* non block input for getch() */
     getch ();
     endwin ();
 }
+
