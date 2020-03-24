@@ -8,6 +8,8 @@ int scale_sin(float value);
 void draw_sin(void);
 void draw_sinback(void);
 
+int draw_again(void);
+
 
 int main(void){
     initscr (); //Function will change the screen into ncurses mode.
@@ -29,10 +31,15 @@ int main(void){
     //nodelay (stdscr, TRUE);
    
     noecho ();			/* stop echo of input */
-
+    int draw = 1;
+    while(draw == 1){
     draw_axis();
     draw_sin();
     draw_sinback();
+    draw = draw_again();
+    }
+
+
 
     nodelay (stdscr, FALSE);	/* non block input for getch() */
     getch ();
@@ -97,4 +104,11 @@ void draw_sinback(void){
         speed -= 2500;
         usleep(speed);
     }
+}
+
+int draw_again(void){
+    clear ();
+    move (15, 15);
+    printw("Start again??? Y/N");
+    return 1;
 }
