@@ -48,6 +48,7 @@
 
 /* Global constants */
 #define ARRAY_SIZE 1000
+#define MAX_DRAW_VALUE 105
 
 /* Global variables */
 
@@ -61,9 +62,9 @@ struct temp_data{
 /*-------------------------------------------------------------------*
 *    FUNCTION PROTOTYPES                                             *
 *--------------------------------------------------------------------*/
-void draw_y_axis(void);
+void draw_xy_axis(float temp_range, int measurements);
 
-void draw_x_axis(void);
+void draw_temp_values(float draw_values[]);
 
 struct temp_data fetch();
 
@@ -72,17 +73,12 @@ struct temp_data fetch();
 **********************************************************************/
 
 int main(void){
-    struct temp_data data;
-    data = fetch();
-    printf("%d", data.temp_values_count);
-    printf("<%f>", data.highest_temp_values);
-    //printf("%d", fetch.temp_values_count);
+    struct temp_data data_from_file;
+    data_from_file = fetch();
 
+    //draw_y_axis(data_from_file.highest_temp_values);
 
-    for (int i = 0; i < data.temp_values_count; i++){
-        printf("%f\n", data.temp_values[i]);
-    }
-    /*initscr (); 
+ initscr (); 
     clear ();   
     nodelay (stdscr, TRUE);	
     
@@ -91,11 +87,13 @@ int main(void){
     bkgd (COLOR_PAIR (1)); 
     noecho ();
 
+    draw_xy_axis(data_from_file.highest_temp_values, data_from_file.temp_values_count);
+    draw_temp_values(data_from_file.temp_values);
 
     
     nodelay (stdscr, FALSE);
     getch ();
-    endwin ();*/
+    endwin ();
 
 } /* end of main */
 
@@ -104,7 +102,7 @@ int main(void){
 **********************************************************************/
 
 /*********************************************************************
-	F U N C T I O N    D E S C R I P T I O N
+	F U N C T I O N    D E S C R I P T I O N TODO:
 ---------------------------------------------------------------------
  NAME:scan_values_from_txt
  DESCRIPTION:scan values from text file and make array
@@ -116,7 +114,7 @@ int main(void){
 *********************************************************************/
 struct temp_data fetch(){
     struct temp_data Fdata;
-    char line[50];
+    char line[ARRAY_SIZE];
     int i = 0;
 
     FILE *filepointer = fopen("day_temp.txt", "r");
@@ -126,25 +124,83 @@ struct temp_data fetch(){
         printf("Write string to file.\n");
     }
 
-    while (fgets(line, 15, filepointer) != NULL){
+    while (fgets(line, ARRAY_SIZE, filepointer) != NULL){
         
         while (line[0] < '0' ||  line[0] > '9'){
-            fgets(line, 15, filepointer);
+            fgets(line, ARRAY_SIZE, filepointer);
         }
-
         sscanf(line, "%f", &Fdata.temp_values[i]);
 
         if (Fdata.temp_values[i] >= Fdata.highest_temp_values){
             Fdata.highest_temp_values = Fdata.temp_values[i];
         }
-        //printf("%f\n", temp_values[i]); TODO: poista
-    
+    i++;
+    }
+    Fdata.temp_values_count = i;
+    fclose(filepointer);
+    return Fdata;
+}
+
+/*********************************************************************
+	F U N C T I O N    D E S C R I P T I O N
+---------------------------------------------------------------------
+ NAME:draw_x&y_axis //TODO: tarkasta rakenne voisi muokata
+ DESCRIPTION:
+	Input:
+	Output:
+  Used global variables:
+  Used global constants:
+ REMARKS when using this function:
+*********************************************************************/
+void draw_xy_axis(float temp_range, int measurements){
+    float y_axis = 0;
+    curs_set(0);
+    int x_axis = 6, i = 0, s = 0;
+    temp_range = temp_range*2+2;
+    while (i <= temp_range){
+        move(i,0);
+        printw("%0.1f", y_axis);
+        y_axis += 0.5;
+        i++;
+    }
+    i = 0;
+    while (x_axis <= 105){
+        move(temp_range, x_axis);
+        printw("%d", i); //TODO:muuta i, kuvaamaan alariviä
+        
+        if (i == 9){
+            i = 0;
+        }
+        else {
+            i++;
+        }
+        if (i == 1){
+            move(temp_range+1, x_axis);
+            printw("%d", s);
+            s++;
+        }
+        x_axis++;
+    }
+}
+
+/*********************************************************************
+	F U N C T I O N    D E S C R I P T I O N
+---------------------------------------------------------------------
+ NAME:draw_temp_values
+ DESCRIPTION:
+	Input:
+	Output:
+  Used global variables:
+  Used global constants:
+ REMARKS when using this function:
+*********************************************************************/
+void draw_temp_values(float draw_values[]){
+    int i = 0;
+    while (i <= 99){ //TODO: korjaa -5 ettei tarvitsisi
+        move(draw_values[i]*2, i+6);
+        printw("x");
     i++;
     }
 
-    printf("<%f>", Fdata.highest_temp_values);
-    Fdata.temp_values_count = i;
-    printf("<<<<<%d>>>>>", Fdata.temp_values_count);
-    fclose(filepointer);
-    return Fdata;
+
 }
