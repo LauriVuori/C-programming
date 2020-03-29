@@ -38,6 +38,7 @@
 *--------------------------------------------------------------------*/
 #include <stdio.h>
 #include <ncurses.h>
+#include <string.h>
 
 /*-------------------------------------------------------------------*
 *    GLOBAL VARIABLES AND CONSTANTS                                  *
@@ -51,6 +52,11 @@
 /* Global variables */
 
 /* Global structures */
+struct temp_data{
+    float temp_values[1000];
+    float highest_temp_values;
+    int temp_values_count;
+};
 
 /*-------------------------------------------------------------------*
 *    FUNCTION PROTOTYPES                                             *
@@ -59,15 +65,23 @@ void draw_y_axis(void);
 
 void draw_x_axis(void);
 
-void scan_values_from_txt(float temp_values[]);
+struct temp_data fetch();
 
 /*********************************************************************
 *    MAIN PROGRAM                                                      *
 **********************************************************************/
 
 int main(void){
-    float temp_values[ARRAY_SIZE];
-    scan_values_from_txt(temp_values);
+    struct temp_data data;
+    data = fetch();
+    printf("%d", data.temp_values_count);
+    printf("<%f>", data.highest_temp_values);
+    //printf("%d", fetch.temp_values_count);
+
+
+    for (int i = 0; i < data.temp_values_count; i++){
+        printf("%f\n", data.temp_values[i]);
+    }
     /*initscr (); 
     clear ();   
     nodelay (stdscr, TRUE);	
@@ -100,35 +114,37 @@ int main(void){
   Used global constants:
  REMARKS when using this function:
 *********************************************************************/
-void scan_values_from_txt(float temp_values[]){
+struct temp_data fetch(){
+    struct temp_data Fdata;
+    char line[50];
+    int i = 0;
+
     FILE *filepointer = fopen("day_temp.txt", "r");
+
     if (filepointer == NULL){
         printf("Error while opening the file. Maybe missing file.\n");
         printf("Write string to file.\n");
     }
 
-    for (int i = 0; i<= 500; i++){
-        fscanf(filepointer, "%f", temp_values[i]);
-        if (temp_values[i]> 0 && ){
-            printf("%f\n", temp_values[i]);
+    while (fgets(line, 15, filepointer) != NULL){
+        
+        while (line[0] < '0' ||  line[0] > '9'){
+            fgets(line, 15, filepointer);
         }
-    }
-    fclose(filepointer);
-}
 
-/*
-void read_file(char main_string[]){
-    FILE *filepointer = fopen("WrittenString.txt", "r");
-    if (filepointer == NULL){
-        printf("Error while opening the file. Maybe missing file.\n");
-        printf("Write string to file.\n");
-        write_string(main_string);
+        sscanf(line, "%f", &Fdata.temp_values[i]);
+
+        if (Fdata.temp_values[i] >= Fdata.highest_temp_values){
+            Fdata.highest_temp_values = Fdata.temp_values[i];
+        }
+        //printf("%f\n", temp_values[i]); TODO: poista
+    
+    i++;
     }
 
-    printf("The contents of file are:\n");
-    fgets(main_string, ARRAY_SIZE, filepointer);
-    printf("%s", main_string);
-
+    printf("<%f>", Fdata.highest_temp_values);
+    Fdata.temp_values_count = i;
+    printf("<<<<<%d>>>>>", Fdata.temp_values_count);
     fclose(filepointer);
+    return Fdata;
 }
-*/
