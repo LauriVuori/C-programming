@@ -48,15 +48,22 @@
 
 /* Global constants */
 #define ARRAY_SIZE 1000
-#define MAX_DRAW_VALUE 105
+#define MAX_DRAW_VALUE 99
+#define START_ROW 6
 
 /* Global variables */
 
 /* Global structures */
-struct temp_data{
-    float temp_values[1000];
-    float highest_temp_values;
-    int temp_values_count;
+struct file_data{
+    int data_start_year,
+        data_start_month,
+        data_start_day,
+        data_start_hour,
+        data_start_min,
+        data_start_sec,
+        temp_values_count;
+    float temp_values[ARRAY_SIZE];
+    float highest_temp_value, lowest_temp_values;
 };
 
 /*-------------------------------------------------------------------*
@@ -64,19 +71,17 @@ struct temp_data{
 *--------------------------------------------------------------------*/
 void draw_xy_axis(float temp_range, int measurements);
 
-void draw_temp_values(float draw_values[]);
+void draw_values(float draw_temp[],int year, int month, int day, int hour, int min, int sec);
 
-struct temp_data fetch();
+struct file_data fetch();
 
 /*********************************************************************
 *    MAIN PROGRAM                                                      *
 **********************************************************************/
 
 int main(void){
-    struct temp_data data_from_file;
-    data_from_file = fetch();
 
-    //draw_y_axis(data_from_file.highest_temp_values);
+
 
  initscr (); 
     clear ();   
@@ -87,10 +92,18 @@ int main(void){
     bkgd (COLOR_PAIR (1)); 
     noecho ();
 
-    draw_xy_axis(data_from_file.highest_temp_values, data_from_file.temp_values_count);
-    draw_temp_values(data_from_file.temp_values);
+    struct file_data data_from_file; //TODO: siirrä ylös
+    data_from_file = fetch();
 
-    
+    draw_xy_axis(data_from_file.highest_temp_value, data_from_file.temp_values_count);
+    draw_values(data_from_file.temp_values, 
+                data_from_file.data_start_year,\
+                data_from_file.data_start_month,\
+                data_from_file.data_start_day,\
+                data_from_file.data_start_hour,\
+                data_from_file.data_start_min,\
+                data_from_file.data_start_sec);
+
     nodelay (stdscr, FALSE);
     getch ();
     endwin ();
@@ -104,7 +117,7 @@ int main(void){
 /*********************************************************************
 	F U N C T I O N    D E S C R I P T I O N TODO:
 ---------------------------------------------------------------------
- NAME:scan_values_from_txt
+ NAME:file_data
  DESCRIPTION:scan values from text file and make array
 	Input: array to fill values from text file
 	Output:TODO: array from scanned values
@@ -112,10 +125,11 @@ int main(void){
   Used global constants:
  REMARKS when using this function:
 *********************************************************************/
-struct temp_data fetch(){
-    struct temp_data Fdata;
+struct file_data fetch(){
+    struct file_data Fdata;
     char line[ARRAY_SIZE];
     int i = 0;
+    Fdata.lowest_temp_values = 1000;
 
     FILE *filepointer = fopen("day_temp.txt", "r");
 
@@ -123,19 +137,35 @@ struct temp_data fetch(){
         printf("Error while opening the file. Maybe missing file.\n");
         printf("Write string to file.\n");
     }
-
+    fgets(line, ARRAY_SIZE, filepointer);
+    sscanf(line,"%*[^0123456789]%d\
+                %*[^0123456789]%d\
+                %*[^0123456789]%d\
+                %*[^0123456789]%d\
+                %*[^0123456789]%d\
+                %*[^0123456789]%d",\
+                &Fdata.data_start_year, \
+                &Fdata.data_start_month, \
+                &Fdata.data_start_day, \
+                &Fdata.data_start_hour,\
+                &Fdata.data_start_min,\
+                &Fdata.data_start_sec);
+        fgets(line,ARRAY_SIZE, filepointer); //TODO: pakko käyttää, jotta skippaa --- rivin, täytyy korjata
     while (fgets(line, ARRAY_SIZE, filepointer) != NULL){
         
-        while (line[0] < '0' ||  line[0] > '9'){
+        while(sscanf(line, "%*[^0123456789]%f", &Fdata.temp_values[i]) == 0 && sscanf(line, "%f", &Fdata.temp_values[i]) == 0){
             fgets(line, ARRAY_SIZE, filepointer);
         }
-        sscanf(line, "%f", &Fdata.temp_values[i]);
-
-        if (Fdata.temp_values[i] >= Fdata.highest_temp_values){
-            Fdata.highest_temp_values = Fdata.temp_values[i];
+        if (Fdata.temp_values[i] >= Fdata.highest_temp_value){
+            Fdata.highest_temp_value = Fdata.temp_values[i];
         }
+        if (Fdata.temp_values[i] <= Fdata.lowest_temp_values){
+            Fdata.lowest_temp_values = Fdata.temp_values[i];
+        }
+        
     i++;
     }
+
     Fdata.temp_values_count = i;
     fclose(filepointer);
     return Fdata;
@@ -144,7 +174,7 @@ struct temp_data fetch(){
 /*********************************************************************
 	F U N C T I O N    D E S C R I P T I O N
 ---------------------------------------------------------------------
- NAME:draw_x&y_axis //TODO: tarkasta rakenne voisi muokata
+ NAME:draw_xy_axis //TODO: tarkasta rakenne voisi muokata
  DESCRIPTION:
 	Input:
 	Output:
@@ -186,7 +216,7 @@ void draw_xy_axis(float temp_range, int measurements){
 /*********************************************************************
 	F U N C T I O N    D E S C R I P T I O N
 ---------------------------------------------------------------------
- NAME:draw_temp_values
+ NAME:draw_values
  DESCRIPTION:
 	Input:
 	Output:
@@ -194,13 +224,17 @@ void draw_xy_axis(float temp_range, int measurements){
   Used global constants:
  REMARKS when using this function:
 *********************************************************************/
-void draw_temp_values(float draw_values[]){
+void draw_values(float draw_temp[],int year, int month, int day, int hour, int min, int sec){
     int i = 0;
-    while (i <= 99){ //TODO: korjaa -5 ettei tarvitsisi
-        move(draw_values[i]*2, i+6);
+    while (i <= MAX_DRAW_VALUE){ //TODO: korjaa -5 ettei tarvitsisi
+        move(draw_temp[i]*2, i+START_ROW);
         printw("x");
     i++;
     }
 
-
+    move(25, 120);
+    printw("Date:%d.%d.%d",day,month,year);
+    move (26, 120);
+    printw("Time:%d:%d:%d-", hour, min, sec);  // TODO: Näyttää pelkästään lähtöajan
+    move(27, 120);
 }
