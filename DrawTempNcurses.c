@@ -150,7 +150,9 @@ struct file_data fetch(){
                 &Fdata.data_start_hour,\
                 &Fdata.data_start_min,\
                 &Fdata.data_start_sec);
-        fgets(line,ARRAY_SIZE, filepointer); //TODO: pakko käyttää, jotta skippaa --- rivin, täytyy korjata
+
+    fgets(line,ARRAY_SIZE, filepointer); //TODO: pakko käyttää, jotta skippaa --- rivin, täytyy korjata
+    
     while (fgets(line, ARRAY_SIZE, filepointer) != NULL){
         
         while(sscanf(line, "%*[^0123456789]%f", &Fdata.temp_values[i]) == 0 && sscanf(line, "%f", &Fdata.temp_values[i]) == 0){
