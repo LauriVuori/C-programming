@@ -1,0 +1,44 @@
+#---------------------------------------------------------------------#
+#Directories, setup
+#---------------------------------------------------------------------#
+IDIR =../include
+ODIR =obj
+LDIR =../lib
+SDIR =src
+
+CFLAGS=-I$(IDIR)
+
+LIBS = -lcurses
+#---------------------------------------------------------------------#
+#Depensies
+#---------------------------------------------------------------------#
+_DEPS = main.h
+DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS)) 
+
+_OBJ = CheckInfected.o ClearVirus.o CountNeighbour.o Drawboard.o EvalfutureBoard.o game_of_life.o Navigation.o SpawnVirus.o RandBoard.o kokgalaxy.o
+OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+
+#---------------------------------------------------------------------#
+# Compile
+#---------------------------------------------------------------------#
+
+Runfile: $(OBJ) 	
+	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+
+#---------------------------------------------------------------------#
+# Commands, install, clean												  
+#---------------------------------------------------------------------#
+
+install:
+	mkdir src src/obj lib include
+	mv *.c $(SDIR)/
+	mv makefile $(SDIR)/
+	mv *.o $(SDIR)/$(ODIR)
+	mv *.h include/
+
+.PHONY: clean
+
+clean:
+	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ 
+
+

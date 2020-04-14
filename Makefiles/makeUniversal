@@ -1,5 +1,0 @@
-install:	$(LIB_NAME)
-	mkdir -p $(INSTALL_PREFIX)/include
-	mkdir -p $(INSTALL_PREFIX)/lib
-	cp $(LIB_API_HEADER_FILES) $(INSTALL_PREFIX)/include
-	cp $(LIB_NAME) $(INSTALL_PREFIX)/lib
