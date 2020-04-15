@@ -1,44 +1,25 @@
-#---------------------------------------------------------------------#
-#Directories, setup
-#---------------------------------------------------------------------#
-IDIR =../include
-ODIR =obj
-LDIR =../lib
-SDIR =src
+CC=gcc
+CFLAGS=-Wall -g
+BINS=librarytest libstaticcode.a static_librarytest libfunc.so run_librarytest
+all: $(BINS)
 
-CFLAGS=-I$(IDIR)
+libfunc.o: libfunc.c header.h
+	$(CC) $(CFLAGS) -c libfunc.c
 
-LIBS = -lcurses
-#---------------------------------------------------------------------#
-#Depensies
-#---------------------------------------------------------------------#
-_DEPS = main.h
-DEPS = $(patsubst %,$(IDIR)/%,$(_DEPS)) 
+libfunc.so: libfunc.c header.h
+	$(CC) $(CFLAGS) -fPIC -shared -o $@ libfunc.c -lc
 
-_OBJ = CheckInfected.o ClearVirus.o CountNeighbour.o Drawboard.o EvalfutureBoard.o game_of_life.o Navigation.o SpawnVirus.o RandBoard.o kokgalaxy.o
-OBJ = $(patsubst %,$(ODIR)/%,$(_OBJ))
+libstaticcode.a: libfunc.o
+	ar rcs libstaticcode.a libfunc.o
 
-#---------------------------------------------------------------------#
-# Compile
-#---------------------------------------------------------------------#
+static_librarytest: librarytest.c
+	$(CC) $(CFLAGS) -o $@ $^ -L. -lstaticcode
 
-Runfile: $(OBJ) 	
-	$(CC) -o $@ $^ $(CFLAGS) $(LIBS)
+librarytest: librarytest.c libfunc.o
+	$(CC) $(CFLAGS) -o $@ $^
 
-#---------------------------------------------------------------------#
-# Commands, install, clean												  
-#---------------------------------------------------------------------#
-
-install:
-	mkdir src src/obj lib include
-	mv *.c $(SDIR)/
-	mv makefile $(SDIR)/
-	mv *.o $(SDIR)/$(ODIR)
-	mv *.h include/
-
-.PHONY: clean
+run_librarytest: librarytest.c
+	$(CC) $(CFLAGS) -o $@ $^ -L. -lfunc
 
 clean:
-	rm -f $(ODIR)/*.o *~ core $(INCDIR)/*~ 
-
-
+	rm *.o $(BINS)
