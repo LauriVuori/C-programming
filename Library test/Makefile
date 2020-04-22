@@ -1,22 +1,22 @@
 CC=gcc
 CFLAGS=-Wall -g
-BINS=librarytest libstaticcode.a static_librarytest libfunc.so run_librarytest
+LD_FLAGS=-L. 
+BINS=libfunc.o librarytest.o header.h libstaticcode.a static_librarytest libfunc1.so run_librarytest
 all: $(BINS)
-
 
 #static
 libstaticcode.a: libfunc.o
 	ar rcs libstaticcode.a libfunc.o
 static_librarytest: librarytest.c
-	$(CC) $(CFLAGS) -o $@ $^ -L. -lstaticcode
+	$(CC) -o $@ $^ $(LD_FLAGS) -lstaticcode
 
 
 
 #dynamic
-libfunc.so: libfunc.c header.h
-	$(CC) $(CFLAGS) -fPIC -shared -o $@ libfunc.c -lc
-run_librarytest: librarytest.c
-	$(CC) $(CFLAGS) -o $@ $^ -L. -lfunc
+libfunc1.so: libfunc.c header.h
+	$(CC) $(CFLAGS) -fPIC -shared -o $@ libfunc.c
+run_librarytest: libfunc.c
+	$(CC) -o $@ $^ $(LD_FLAGS) -lfunc1
 
 clean:
-	rm *.o $(BINS)
+	rm *.o *.so *.a *.exe

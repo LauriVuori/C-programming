@@ -1,0 +1,22 @@
+CC=gcc
+CFLAGS=-Wall -g
+LD_FLAGS=-L. 
+BINS=librarytest libstaticcode.a static_librarytest libfunc.so run_librarytest
+all: $(BINS)
+
+test: libfunc.c librarytest.c header.h
+	$(CC) -c  *.c
+	
+#static
+libstaticcode.a: libfunc.o
+	ar rcs libstaticcode.a libfunc.o
+static_librarytest: librarytest.c
+	$(CC) -o $@ $^ $(LD_FLAGS) -lstaticcode
+
+
+
+#dynamic
+libfunc.so: libfunc.c header.h
+	$(CC) $(CFLAGS) -fPIC -shared -o $@ libfunc.c -lc
+run_librarytest: librarytest.c
+	$(CC) -o $@ $^ $(LD_FLAGS) -lfunc
