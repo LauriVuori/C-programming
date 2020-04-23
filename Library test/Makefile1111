@@ -1,0 +1,24 @@
+CC=gcc
+CFLAGS=-Wall -g
+LD_FLAGS=-L.
+BINS= function.o libstaticcode.a static_librarytest libdynam.so run_librarytest
+all: $(BINS)
+
+function.o: function.c header.h
+	$(CC) $(CFLAGS) -c function.c
+
+#static
+libstaticcode.a: function.o
+	ar rcs libstaticcode.a function.o
+
+static_librarytest: main.c
+	$(CC) -o $@ $^ $(LD_FLAGS) -lstaticcode
+
+#dynamic
+libdynam.so: function.c header.h
+	$(CC) $(CFLAGS) -fPIC -shared -o $@ function.c
+run_librarytest: function.c
+	$(CC) -o $@ $^ $(LD_FLAGS) -ldynam
+
+clean:
+	rm *.o *.so *.a *.exe

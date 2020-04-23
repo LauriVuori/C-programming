@@ -1,22 +1,44 @@
+#all: library.cpp main.cpp
+#$@ evaluates to all
+#$< evaluates to library.cpp
+#$^ evaluates to library.cpp main.cpp
+#ar t (static lib insides)
+#nm -D (dynamic..)
+
+
+
+
 CC=gcc
-CFLAGS=-Wall -g
-LD_FLAGS=-L. 
-BINS=libfunc.o librarytest.o header.h libstaticcode.a static_librarytest libfunc1.so run_librarytest
-all: $(BINS)
+CFLAGS=-Wall -fPIC
+LD_FLAGS=-L.
+RUN=normal createdyna linkversion rundynamic staticlib runstatic
+all: $(RUN)
 
-#static
-libstaticcode.a: libfunc.o
-	ar rcs libstaticcode.a libfunc.o
-static_librarytest: librarytest.c
-	$(CC) -o $@ $^ $(LD_FLAGS) -lstaticcode
-
+#normal linking----------
+normal: main.o function.o function2.o 
+	$(CC) $(CFLAGS) $^ -o $@
+#-----------------------
 
 
-#dynamic
-libfunc1.so: libfunc.c header.h
-	$(CC) $(CFLAGS) -fPIC -shared -o $@ libfunc.c
-run_librarytest: libfunc.c
-	$(CC) -o $@ $^ $(LD_FLAGS) -lfunc1
 
+#dynamic linking--------
+createdyna: 
+	$(CC) -shared -Wl,-soname,libdynamic.so.1.0 -o libdynamic.so.1.0 *.o
+
+linkversion:
+	ln -sf libdynamic.so.1.0 libdynamic.so
+
+rundynamic: main.c
+	$(CC) -Wall $^ -L. -ldynamic -o $@
+#-----------------------
+
+#static linking--------
+staticlib: function.o function2.o
+	ar rcs libstatic.a $^
+
+runstatic: main.o
+	$(CC) -o $@ $^ $(LD_FLAGS) -lstatic
+
+#----------------------
 clean:
-	rm *.o *.so *.a *.exe
+	rm *.o *.so normal runstatic rundynamic libdynamic.so.1.0 *.a 
