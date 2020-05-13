@@ -9,10 +9,12 @@ if user will enter new product (yes/no-question).*/
 
 
 int main(void){
-    int store[500], product, amount;
+    int store[500] = {0}, product, amount;
 
     printf("Give product number?");
     scanf("%d", product);
+    printf("Give amount?\n");
+    scanf("%d", amount);
 
-    
+    stote[product] = amount;
 }
