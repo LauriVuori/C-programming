@@ -6,15 +6,54 @@ if user will enter new product (yes/no-question).*/
 
 
 #include <stdio.h>
+#define ARRAY_SIZE 50
+struct product{
+    int prod_amount;
+    float prod_price;
+};
 
+void ask_prodamount(struct product info[ARRAY_SIZE]);
+void print_products(struct product info[ARRAY_SIZE]);
+void print_menu();
 
 int main(void){
-    int store[500] = {0}, product, amount;
+    struct product info[ARRAY_SIZE] = {0};
+    char command;
 
-    printf("Give product number?");
-    scanf("%d", product);
-    printf("Give amount?\n");
-    scanf("%d", amount);
+    do{
+        print_menu();
+        scanf("%c", &command);
+        switch (command)
+        {
+        case '1':
+            ask_prodamount(info);
+            break;
+        
+        default:
+            break;
+        }
+    }while(command != 'n');    
+}
 
-    stote[product] = amount;
+void print_menu(){
+    printf("1: ask prods\n");
+    printf("n exit\n");
+}
+
+
+void ask_prodamount(struct product info[ARRAY_SIZE]){
+int amount = 0, item_num = 0;
+    printf("Give product name:\n");
+    scanf("%d", &item_num);
+    printf("Give product amount:\n");
+    scanf("%d", &amount);
+
+    info[5].prod_amount = amount;
+}
+
+void print_products(struct product info[ARRAY_SIZE]){
+int i;
+    for (i = 0; i < ARRAY_SIZE; i++){
+        printf("%d: %d\n",i, info[i].prod_amount);
+    }
 }
