@@ -10,20 +10,20 @@ if user will enter new product (yes/no-question).*/
 
 #define ARRAY_SIZE 50
 
-
-struct product{
+//typedef
+typedef struct {
     int prod_amount;
     float prod_price;
-};
+}product;
 
-void ask_prodamount(struct product info[ARRAY_SIZE]);
-void print_products(struct product info[ARRAY_SIZE]);
+void ask_prodamount(product *info);
+void print_products(product *info);
 void print_added_products(int item_num, int amount);
 char ask_command();
 void print_menu();
 
 int main(void){
-struct product info[ARRAY_SIZE] = {0};
+product info[ARRAY_SIZE] = {0};
 char command;
 
 
@@ -39,11 +39,11 @@ char command;
             break;
 
         case 'b':
-            ask_prodamount(info);
+            ask_prodamount(&info);
             break;
         
         case 'c':
-            print_products(info);
+            print_products(&info);
             break;
         }
     }while(command != 'n');    
@@ -71,7 +71,7 @@ char return_command, temporal_array[ARRAY_SIZE];
 }
 
 
-void ask_prodamount(struct product info[ARRAY_SIZE]){
+void ask_prodamount(product *info){
 int amount = 0, item_num = 0, counter = 0;
 char temporal_array[ARRAY_SIZE], command = 'y';
 int changed_items[ARRAY_SIZE], changed_amounts[ARRAY_SIZE];
@@ -87,7 +87,7 @@ int changed_items[ARRAY_SIZE], changed_amounts[ARRAY_SIZE];
         fgets(temporal_array, ARRAY_SIZE, stdin);
         sscanf(temporal_array, "%d", &amount);
 
-        info[item_num].prod_amount = amount;
+        info[item_num]->prod_amount = amount;
         changed_items[counter] = item_num;
         changed_amounts[counter] = amount;
         amount = 0;
@@ -105,10 +105,10 @@ void print_added_products(int item_nums[ARRAY_SIZE], int item_amounts[ARRAY_SIZE
     printf("Item number: %d\nAmount:%d\n", item_num, amount);
 }
 
-void print_products(struct product info[ARRAY_SIZE]){
+void print_products(product *info){
 int i;
 
     for (i = 0; i < ARRAY_SIZE; i++){
-        printf("%d: %d\n",i, info[i].prod_amount);
+        printf("%d: %d\n",i, info[i]->prod_amount);
     }
 }
