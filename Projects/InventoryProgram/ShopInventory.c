@@ -12,18 +12,18 @@ if user will enter new product (yes/no-question).*/
 
 //typedef
 typedef struct {
-    int prod_amount;
-    float prod_price;
+    int prod_amount[50];
+    float prod_price[50];
 }product;
 
 void ask_prodamount(product *info);
 void print_products(product *info);
-void print_added_products(int item_num, int amount);
+void print_added_products(int item_nums[ARRAY_SIZE], int item_amounts[ARRAY_SIZE], int counter);
 char ask_command();
 void print_menu();
 
 int main(void){
-product info[ARRAY_SIZE] = {0};
+product info = {0};
 char command;
 
 
@@ -87,7 +87,7 @@ int changed_items[ARRAY_SIZE], changed_amounts[ARRAY_SIZE];
         fgets(temporal_array, ARRAY_SIZE, stdin);
         sscanf(temporal_array, "%d", &amount);
 
-        info[item_num]->prod_amount = amount;
+        info->prod_amount[item_num] = amount;
         changed_items[counter] = item_num;
         changed_amounts[counter] = amount;
         amount = 0;
@@ -97,18 +97,20 @@ int changed_items[ARRAY_SIZE], changed_amounts[ARRAY_SIZE];
         command = ask_command();
     }
 
-    print_added_products(item_num, amount);
+    //print_added_products(item_num, amount,counter);
 }
 
-void print_added_products(int item_nums[ARRAY_SIZE], int item_amounts[ARRAY_SIZE]){
+/*void print_added_products(int item_nums[ARRAY_SIZE], int item_amounts[ARRAY_SIZE], int counter){
     printf("You added following items:\n");
-    printf("Item number: %d\nAmount:%d\n", item_num, amount);
-}
+    for(int i = 0; i <= counter; i++){
+    printf("Item number: %d\nAmount:%d\n", item_num[i], amount[i]);
+    }
+}*/
 
 void print_products(product *info){
 int i;
 
     for (i = 0; i < ARRAY_SIZE; i++){
-        printf("%d: %d\n",i, info[i]->prod_amount);
+        printf("%d: %d\n",i, info->prod_amount[i]);
     }
 }
