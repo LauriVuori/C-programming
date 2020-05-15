@@ -73,8 +73,8 @@ char return_command, temporal_array[ARRAY_SIZE];
 
 void ask_prodamount(product *info){
 int amount = 0, item_num = 0, counter = 0;
-char temporal_array[ARRAY_SIZE], command = 'y';
-int changed_items[ARRAY_SIZE], changed_amounts[ARRAY_SIZE];
+char temporal_array[ARRAY_SIZE] = {0}, command = 'y';
+int changed_items[ARRAY_SIZE] ={0}, changed_amounts[ARRAY_SIZE];
 
     while(command == 'y'){
         printf("Give product name/number:\n");
@@ -93,19 +93,21 @@ int changed_items[ARRAY_SIZE], changed_amounts[ARRAY_SIZE];
         amount = 0;
         item_num = 0;
         counter++;
+        
         printf("Do you want to continue Y/N\n");
         command = ask_command();
     }
-
-    //print_added_products(item_num, amount,counter);
+    
+    print_added_products(changed_items, changed_amounts, counter);
 }
 
-/*void print_added_products(int item_nums[ARRAY_SIZE], int item_amounts[ARRAY_SIZE], int counter){
-    printf("You added following items:\n");
-    for(int i = 0; i <= counter; i++){
-    printf("Item number: %d\nAmount:%d\n", item_num[i], amount[i]);
+void print_added_products(int item_nums[ARRAY_SIZE], int item_amounts[ARRAY_SIZE], int counter){
+printf("You added following items:\n");
+    
+    for (int i = 0; i < counter; i++){
+        printf("Item number: %d\nAmount:%d\n", item_nums[i], item_amounts[i]);
     }
-}*/
+}
 
 void print_products(product *info){
 int i;
