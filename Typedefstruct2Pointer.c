@@ -1,14 +1,14 @@
 #include <stdio.h>
 
 typedef struct{
-    int num[50];
-    float num2[50];
+    int num;
+    float num2;
 }test;
 
 void testfunc(test *numbers);
 
 int main(void){
-test numbers = {0};
+test numbers[50];
     
 
     testfunc(&numbers);
