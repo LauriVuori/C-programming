@@ -21,6 +21,7 @@ void print_products(product *info);
 void print_added_products(int item_nums[ARRAY_SIZE], int item_amounts[ARRAY_SIZE], int counter);
 char ask_command();
 void print_menu();
+void read_inventory(product *info);
 
 int main(void){
 product info = {0};
@@ -45,6 +46,9 @@ char command;
         case 'c':
             print_products(&info);
             break;
+        case 'd':
+            read_inventory(&info);
+            break;
         }
     }while(command != 'n');    
 }
@@ -52,7 +56,8 @@ char command;
 void print_menu(){
     printf("A:print menu\n");
     printf("B:Ask product amount:\n");
-    printf("C:Print products");
+    printf("C:Print products\n");
+    printf("D:Read invetory\n");
     printf("N exit\n");
 }
 
@@ -105,7 +110,7 @@ void print_added_products(int item_nums[ARRAY_SIZE], int item_amounts[ARRAY_SIZE
 printf("You added following items:\n");
     
     for (int i = 0; i < counter; i++){
-        printf("Item number: %d\nAmount:%d\n", item_nums[i], item_amounts[i]);
+        printf("product%3d:%3d pcs\n", item_nums[i], item_amounts[i]);
     }
 }
 
@@ -115,4 +120,18 @@ int i;
     for (i = 0; i < ARRAY_SIZE; i++){
         printf("%d: %d\n",i, info->prod_amount[i]);
     }
+}
+
+void read_inventory(product *info){
+    int inv, i = 0, counter = 0;
+    char temp[1000];
+    FILE *fp;
+    fp=fopen("inventory.txt","r");
+
+    while (fgets(temp, 100, fp) != NULL){
+        sscanf(temp, "%d", &info->prod_amount[i]);
+        i++;
+    }
+    counter = i;
+    fclose(fp);
 }
