@@ -19,6 +19,7 @@ typedef struct {
 void ask_prodamount(product *info);
 void print_products(product *info);
 void print_added_products(int item_nums[ARRAY_SIZE], int item_amounts[ARRAY_SIZE], int counter);
+void add_products_file(int item_nums[ARRAY_SIZE], int item_amounts[ARRAY_SIZE], int counter);
 char ask_command();
 void print_menu();
 void read_inventory(product *info);
@@ -137,6 +138,10 @@ void read_inventory(product *info){
     fclose(fp);
 }
 
-void add_products_file((int item_nums[ARRAY_SIZE], int item_amounts[ARRAY_SIZE], int counter)){
+void add_products_file(int item_nums[ARRAY_SIZE], int item_amounts[ARRAY_SIZE], int counter){
+printf("You added following items:\n");
     
+    for (int i = 0; i < counter; i++){
+        printf("product%3d:%3d pcs\n", item_nums[i], item_amounts[i]);
+    }
 }
