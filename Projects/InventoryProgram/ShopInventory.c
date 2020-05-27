@@ -27,7 +27,7 @@ int main(void){
 product info = {0};
 char command;
 
-
+read_inventory(&info);
     print_menu();
     do{
 
@@ -104,6 +104,7 @@ int changed_items[ARRAY_SIZE] ={0}, changed_amounts[ARRAY_SIZE];
     }
     
     print_added_products(changed_items, changed_amounts, counter);
+    add_products_file(changed_items,changed_amounts,counter);
 }
 
 void print_added_products(int item_nums[ARRAY_SIZE], int item_amounts[ARRAY_SIZE], int counter){
@@ -126,7 +127,7 @@ void read_inventory(product *info){
     int inv, i = 0, counter = 0;
     char temp[1000];
     FILE *fp;
-    fp=fopen("inventory.txt","r");
+    fp = fopen("inventory.txt","r");
 
     while (fgets(temp, 100, fp) != NULL){
         sscanf(temp, "%d", &info->prod_amount[i]);
@@ -134,4 +135,8 @@ void read_inventory(product *info){
     }
     counter = i;
     fclose(fp);
+}
+
+void add_products_file((int item_nums[ARRAY_SIZE], int item_amounts[ARRAY_SIZE], int counter)){
+    
 }
