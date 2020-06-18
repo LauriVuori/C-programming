@@ -123,7 +123,7 @@ int i;
         printf("%d: %d\n",i, info->prod_amount[i]);
     }
 }
-
+//TODO: ei lue kuin luvun
 void read_inventory(product *info){
     int inv, i = 0, counter = 0;
     char temp[1000];
@@ -131,7 +131,8 @@ void read_inventory(product *info){
     fp = fopen("inventory.txt","r");
 
     while (fgets(temp, 100, fp) != NULL){
-        sscanf(temp, "%d", &info->prod_amount[i]);
+        sscanf(temp, "'' '%d'",&info->prod_amount[i]);
+        printf("%d", info->prod_amount[i]);
         i++;
     }
     counter = i;
