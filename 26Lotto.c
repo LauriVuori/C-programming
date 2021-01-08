@@ -10,45 +10,65 @@ c) Arvo lottirivi ja oikea rivi. Laske montako kertaa pitää arpoa, jotta saada
 #include <stdlib.h>
 #include <time.h>
 
-#define MAXNUMS 10
+#define MAXNUMS 7
 
 void randomizeNumbers(int * arNumbers, int * minNum, int * maxNum, int * numbersQuantity);
 
 int main(void){
-    int randomNum = 0;
-    int userNumbers[MAXNUMS], correctNumbers[MAXNUMS], numbers[39] = {0};
 
-    for (int i = 1; i <= MAXNUMS; i++){
+    int randomNum = 0, minNum = 1, maxNum = 39, qnty = MAXNUMS, correctNums = 0, randTimes = 0, found = 0;
+    int userNumbers[MAXNUMS], correctNumbers[MAXNUMS], numbers[39] = {0};
+    srand((unsigned) time(NULL));
+    for (int i = 0; i < MAXNUMS; i++){
         userNumbers[i] = 0;
         correctNumbers[i] = 0;
     }
+    randomizeNumbers(&correctNumbers[0], &minNum, &maxNum, &qnty);
 
-    srand((unsigned) time(NULL));
-    for (int i = 0; i < MAXNUMS; i++){
-        randomNum = rand()%39+1;
-        correctNumbers[i] = randomNum;
-        for (int b = 0; b < i; b++){
-            if (correctNumbers[i] == correctNumbers[b]){
-                randomNum = rand()%39+1;
-                correctNumbers[i] = randomNum;
-                b = 0;
+    while (found <= 30) {
+        correctNums = 0;
+        randomizeNumbers(&userNumbers[0], &minNum, &maxNum, &qnty);
+        for (int i = 0; i < MAXNUMS; i++){
+            for (int b = 0; b < MAXNUMS; b++){
+                if (correctNumbers[i] == userNumbers[b]){
+                    correctNums++;
+                }
             }
         }
-        numbers[correctNumbers[i]]++;
-    }
-
-    for (int i = 0; i < MAXNUMS; i++){
-        randomNum = rand()%39+1;
-        userNumbers[i] = randomNum;
-        for (int b = 0; b < i; b++){
-            if (userNumbers[i] == userNumbers[b]){
-                randomNum = rand()%39+1;
-                userNumbers[i] = randomNum;
-                b = 0;
-            }
+        randTimes++;
+        if (correctNums >= 7){
+            found++;
         }
-        numbers[userNumbers[i]]++;
     }
+    float test = (float)randTimes / 30;
+    printf("%0.0f", test);
+    
+    
+    // for (int i = 0; i < MAXNUMS; i++){
+    //     randomNum = rand()%39+1;
+    //     correctNumbers[i] = randomNum;
+    //     for (int b = 0; b < i; b++){
+    //         if (correctNumbers[i] == correctNumbers[b]){
+    //             randomNum = rand()%39+1;
+    //             correctNumbers[i] = randomNum;
+    //             b = 0;
+    //         }
+    //     }
+    //     numbers[correctNumbers[i]]++;
+    // }
+
+    // for (int i = 0; i < MAXNUMS; i++){
+    //     randomNum = rand()%39+1;
+    //     userNumbers[i] = randomNum;
+    //     for (int b = 0; b < i; b++){
+    //         if (userNumbers[i] == userNumbers[b]){
+    //             randomNum = rand()%39+1;
+    //             userNumbers[i] = randomNum;
+    //             b = 0;
+    //         }
+    //     }
+    //     numbers[userNumbers[i]]++;
+    // }
 
     // for (int i = 0; i < MAXNUMS; i++){
     //     printf("%d ", correctNumbers[i]);
@@ -57,15 +77,8 @@ int main(void){
     // for (int i = 0; i < MAXNUMS; i++){
     //     printf("%d ", userNumbers[i]);
     // }
-    printf("\n");
-    int b = 0;
-    for (int i = 0; i < MAXNUMS; i++){
-        for (int b = 0; b < MAXNUMS; b++){
-            if (correctNumbers[i] == userNumbers[b]){
-                b++;
-            }
-        }
-    }
+
+ 
     // for (int i = 0; i < MAXNUMS; i++){
     //     // printf("%d ", correctNumbers[i]);
     //     printf("%d ", userNumbers[i]);
@@ -78,14 +91,20 @@ int main(void){
     //     userNumbers[i] = randomNum;
     //     printf("%d ", userNumbers[i]);
     // }
-    int *ptr = correctNumbers;
-    randomizeNumbers(ptr,(int*)1,(int*)39,(int*)MAXNUMS);
+
 }
 
 void randomizeNumbers(int * arNumbers, int * minNum, int * maxNum, int * numbersQuantity){
-    printf("%d %d %d %d", arNumbers[0], minNum, maxNum, numbersQuantity);
-    for (int i = 0; i < numbersQuantity; i++){
-        printf("%d %d %d %d\n", arNumbers[i], minNum, maxNum, numbersQuantity);
-    }
-    printf("end");
+    int randomNum = 0;
+        for (int i = 0; i < *numbersQuantity; i++){
+            randomNum = rand()% *maxNum + *minNum;
+            arNumbers[i] = randomNum;
+            for (int b = 0; b < i; b++){
+                if (arNumbers[i] == arNumbers[b]){
+                    randomNum = rand()%39+1;
+                    arNumbers[i] = randomNum;
+                    b = 0;
+                }
+            }
+        }
 }
