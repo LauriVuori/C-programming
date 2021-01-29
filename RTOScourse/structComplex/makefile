@@ -10,7 +10,7 @@ CFLAGS = -c -I$(INCLUDE)
 OBJECTS := $(patsubst %.c,%.o,$(wildcard $(SRC)*.c))
 
 
-EXECUTABLE = runstrings
+EXECUTABLE = runcomplex
 
 
 all: $(OBJECTS) $(EXECUTABLE)
