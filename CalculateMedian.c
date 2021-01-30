@@ -10,15 +10,15 @@ printf("%d",median(my_array,5));
 
 #include <stdio.h>
 
-float median( int given_numbers[],  int array_length);
+int median( int given_numbers[],  int array_length);
 int main(void){
     int my_array[]={66,-100,2,-7,99,123,-44,22,48,53,4};
-    printf("<%0.1f>",median(my_array,11));
+    printf("<%d>",median(my_array,11));
     //2,4,1,5,3
 
 }
 
-float median( int given_numbers[],  int array_length){
+int median( int given_numbers[],  int array_length){
     int i,a;
     int temp = 0;
     float median = 0;
@@ -43,6 +43,7 @@ float median( int given_numbers[],  int array_length){
         median = (array_length/2 + 1);
         printf("%f", median);
         median = i;
-        printf("%d", given_numbers[i]);
+        printf("<<<%d>>>", given_numbers[i]);
     }
+    return given_numbers[i];
 }
