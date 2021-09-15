@@ -14,14 +14,14 @@ void uint8_to_char_array(uint8_t uInteger, uint8_t * dest_array);
 void print(uint8_t * string) {	
     for (int i = 0; *string != '\0'; i++) {
 		printf("%c", *string);
-    	printf("\n");
 		string++;
 	}
+    printf("\n");
 }
 
 int main(void) {
-    uint8_t integer8[12] = {"\0"};
-    uint8_t integer16[12] = {"\0"};
+    uint8_t integer8[12] = {0};
+    uint8_t integer16[12] = {0};
     uint8_t integer32[12] = {0};
     // uint8_to_char_array(200, &integer8[0]);
     // uint16_to_char_array(5000, &integer16[0]);
@@ -31,9 +31,10 @@ int main(void) {
     // for (int i = 0; integer16[i] != '\0'; i++) {
     //     printf("<%c><%d>\n", integer16[i], integer16[i]);
     // }
-
+    uint16_to_char_array(65000, integer16);
+    print(integer16);
     // printf("\n");
-    uint32_to_char_array(120000, &integer32[0]);
+    uint32_to_char_array(1120000, &integer32[0]);
 	print(integer32);
 	//     for (int i = 0; integer32[i] != '\0'; i++) {
     //     printf("<%c><%d>\n", integer32[i], integer32[i]);
