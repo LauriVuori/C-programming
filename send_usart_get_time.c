@@ -18,7 +18,7 @@ void format_time(char * output){
                                                      timeinfo->tm_min, 
                                                      timeinfo->tm_sec, 
                                                      timeinfo->tm_mday, 
-                                                     timeinfo->tm_mon, 
+                                                     timeinfo->tm_mon+1, 
                                                      timeinfo->tm_year + 1900);
 }
 
