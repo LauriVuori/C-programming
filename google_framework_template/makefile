@@ -4,14 +4,29 @@
 # g++ -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -c ${GTEST_DIR}/src/gtest-all.cc ar -rv libgtest.a gtest-all.o
 # Unit test g++ -isystem ${GTEST_DIR}/include -pthread unit_test_case.c code_to_be_tested.c Gtest_main.c libgtest.a -o my_test
 
-PROJ = testing
+# when running test_file, unnecesary in test folder, should be fixed
+
+# commands
+# make
+# make release
+# make test
+# make report
+
+PROJ = program
+FILE_FOR_TESTING = code_to_be_tested
 # Compiler
 CC = gcc
+ifeq ($(CC), gcc)
+FILETYPE = c
+else
+FILETYPE = cpp
+endif
+
 # Include folder
 INCLUDE = ./include/
-
+TEST_FILE = test_file
 # Source folder
-SRC=./src/
+SRC=./src
 # Debugging
 #CFLAGS = -g -c -Wall -I$(INCLUDE)
 # Release
@@ -28,11 +43,9 @@ CFLAGS = -c -I$(INCLUDE) -lpthread
 #$(patsubst pattern,replacement,text)
 #Below we assume that the .cpp source files are under $(SRC) directory
 
-ifeq ($(CC), gcc)
-OBJECTS := $(patsubst %.c,%.o,$(wildcard $(SRC)*.c))
-else
-OBJECTS := $(patsubst %.cpp,%.o,$(wildcard $(SRC)*.cpp))
-endif
+
+OBJECTS := $(patsubst %.$(FILETYPE),%.o,$(wildcard $(SRC)/*.$(FILETYPE)))
+
 
 # Name of executable
 EXECUTABLE = $(PROJ)
@@ -50,12 +63,6 @@ $(EXECUTABLE) : $(OBJECTS)
 .c.o: *.h
 	$(CC) $(CFLAGS) $< -o $@
 
-clean:
-	-rm -f $(OBJECTS) $(EXECUTABLE)
-
-clean_release:
-	-rm -f $(OBJECTS)
-
 
 # Make release
 release: all clean_release
@@ -68,36 +75,63 @@ release: all clean_release
 # ifdef LOCAL
 # GTEST_DIR=~/googletest/googletest
 GTEST_INCLUDE=-I $(GTEST_DIR)/include
-# GTEST_LIB=libgtest.a
+GTEST_LIB = ./g_lib
 # else
 # GTEST_DIR=
 # GTEST_INCLUDE=
 # GTEST_LIB=-lgtest
 # endif
 
-
-COPTS=-Wall -fpermissive
+FLAGS = -Wall
+COPTS= -Wall -fpermissive
 COPTS_COV=$(COPTS) -fprofile-arcs -ftest-coverage
 LDFLAGS=-fprofile-arcs -ftest-coverage
 COV_OUTPUT=./cov_output
 
 TEST_DIR = ./test
+# change location of lib
+test: Gtest_main.o unit_test_case.o $(FILE_FOR_TESTING)_test.o $(GTEST_LIB)/libgtest.a  
+	g++  $(LDFLAGS) -pthread $(TEST_DIR)/Gtest_main.o $(TEST_DIR)/unit_test_case.o $(TEST_DIR)/$(FILE_FOR_TESTING)_test.o $(GTEST_LIB)/libgtest.a -o $(TEST_FILE)
 
-test: $(TEST_DIR)/Gtest_main.o $(TEST_DIR)/unit_test_case.o $(SRC)code_to_be_tested.o $(GTEST_LIB) libgtest.a 
-	g++  $(LDFLAGS) $(GTEST_INCLUDE) -pthread   $(TEST_DIR)/unit_test_case.o $(SRC)code_to_be_tested.o $(TEST_DIR)/Gtest_main.o  -o test_file
-# $(TEST_DIR)_test.o
-libgtest.a:
-	g++ -isystem $(GTEST_DIR)/include -I $(GTEST_DIR) -pthread -c $(GTEST_DIR)/src/gtest-all.cc
-	ar -rv  libgtest.a gtest-all.o
+$(GTEST_LIB)/libgtest.a:
+	g++ -isystem $(GTEST_DIR)/include -I $(GTEST_DIR) -pthread -c $(GTEST_DIR)/src/gtest-all.cc -o $(GTEST_LIB)/gtest-all.o
+	ar -rv  $(GTEST_LIB)/libgtest.a $(GTEST_LIB)/gtest-all.o
 
 Gtest_main.o: $(TEST_DIR)/Gtest_main.c
 	g++ -c $(TEST_DIR)/Gtest_main.c $(GTEST_INCLUDE) -o $(TEST_DIR)/Gtest_main.o
 
-unit_test_case.o: $(TEST_DIR)/unit_test_case.c
-	g++ -c $(COPTS) $(TEST_DIR)/unit_test_case.c $(GTEST_INCLUDE) -o $(TEST_DIR)/unit_test_case.o
+unit_test_case.o: $(TEST_DIR)/unit_test_case.$(FILETYPE)
+	g++ -c $(COPTS) $(TEST_DIR)/unit_test_case.$(FILETYPE) $(GTEST_INCLUDE) -I $(SRC)/$(FILE_FOR_TESTING)/ -o $(TEST_DIR)/unit_test_case.o
 
-code_to_be_tested.o: $(SRC)code_to_be_tested.c $(GTEST_INCLUDE) libgtest.a
-	g++ -c $(SRC)code_to_be_tested.c $(GTEST_INCLUDE) -o $(SRC)code_to_be_tested.o 
+$(FILE_FOR_TESTING)_test.o: $(SRC)/$(FILE_FOR_TESTING).c 
+	$(CC) -c $(COPTS_COV) $(FLAGS) $(SRC)/$(FILE_FOR_TESTING).c -o $(TEST_DIR)/$(FILE_FOR_TESTING)_test.o
 
 
-################### Google Test framework #######################
+# $(FILE_FOR_TESTING)_test.gcno:
+# 	./test_file
+
+################### Coverage analysis #######################
+
+report:
+	gcc $(COPTS_COV) -isystem ${GTEST_DIR}/include -pthread -I$(SRC)/ $(SRC)/main.c $(SRC)/$(FILE_FOR_TESTING).$(FILETYPE) -o branch
+	./branch
+	rm -f main.gcda main.gcno branch
+	lcov -rc lcov_branch_coverage=1 -c -i -d . -o .coverage.base
+	lcov -rc lcov_branch_coverage=1 -c -d . -o .coverage.run
+	lcov -rc lcov_branch_coverage=1 -d . -a .coverage.base -a .coverage.run -o .coverage.total
+	genhtml --branch-coverage -o $(COV_OUTPUT) .coverage.total
+	rm -f .coverage.base .coverage.run .coverage.total branch  $(FILE_FOR_TESTING).gcno $(FILE_FOR_TESTING).gcda
+
+	
+
+clean:
+	-rm -f $(OBJECTS) $(EXECUTABLE)  $(TEST_DIR)/Gtest_main.o $(TEST_DIR)/unit_test_case.o 
+	-rm -f $(TEST_DIR)/$(FILE_FOR_TESTING)_test.o
+
+clean_release:
+	-rm -f $(OBJECTS)
+
+clean_all: 
+	-rm -f $(OBJECTS) $(EXECUTABLE)  $(TEST_DIR)/Gtest_main.o $(TEST_DIR)/unit_test_case.o 
+	-rm -f $(TEST_DIR)/$(FILE_FOR_TESTING)_test.o
+	-rm -f -r $(COV_OUTPUT)/* $(GTEST_LIB)/* test_file

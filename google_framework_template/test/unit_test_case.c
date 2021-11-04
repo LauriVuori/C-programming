@@ -1,5 +1,6 @@
 #include <gtest/gtest.h>
 #include "../include/my_math.h"
+#include "../src/code_to_be_tested.c"
 
 TEST(MytestCategory,MyTest1)
 {
