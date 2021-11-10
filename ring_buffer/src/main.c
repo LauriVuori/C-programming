@@ -2,7 +2,18 @@
 #include "../include/ring_buffer.h"
 
 
+uint8_t transmission_buffer[MAX_BUFFER];
+uint8_t recive_buffer[MAX_BUFFER];
+
 int main(void) {
+    struct buffer_type tb;
+    int err;
+    int i, len;
+
+
+    // init_buffer(&tb,transmission_buffer);
+    // len = add_char_to_buffer(&tb, 'a', (enum error_type*)&err);
+    // print_buffer(tb);
     // ring_buffer_uint8_t rb_data;
     // int a = 0;
     // uint8_t test_buffer[55];
@@ -41,4 +52,5 @@ int main(void) {
 // put a byte in to queue, HEAD,
 // flush or clear
 // print ring buffer
+
 

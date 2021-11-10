@@ -35,7 +35,7 @@ SRC=./src
 # Compilation flags
 #-c is to create the .o file(s)
 #-I is to include the header directory 
-CFLAGS = -c -I$(INCLUDE) -lpthread
+CFLAGS = -c -I$(INCLUDE) #-lpthread
 
 #We could have also mentioned the list of source files 
 #SOURCES =  profession.cpp employee.cpp main.cpp
@@ -107,7 +107,7 @@ $(FILE_FOR_TESTING)_test.o: $(SRC)/$(FILE_FOR_TESTING).c
 ################### Coverage analysis #######################
 
 report:
-	gcc $(COPTS_COV) -isystem ${GTEST_DIR}/include -pthread -I$(SRC)/ $(GTEST_LIB)/libgtest.a $(SRC)/main.c $(SRC)/$(FILE_FOR_TESTING).$(FILETYPE) -o branch
+	gcc $(COPTS_COV) -isystem ${GTEST_DIR}/include -pthread ./test/unit_test_case.o $(GTEST_LIB)/libgtest.a ./test/Gtest_main.o $(SRC)/$(FILE_FOR_TESTING).$(FILETYPE) -o branch
 	./branch
 	lcov -rc lcov_branch_coverage=1 -c -i -d . -o .coverage.base
 	lcov -rc lcov_branch_coverage=1 -c -d . -o .coverage.run
@@ -121,6 +121,7 @@ report:
 clean:
 	-rm -f $(OBJECTS) $(EXECUTABLE)  $(TEST_DIR)/Gtest_main.o $(TEST_DIR)/unit_test_case.o 
 	-rm -f $(TEST_DIR)/$(FILE_FOR_TESTING)_test.o
+	-rm -f $(TEST_DIR)/*.gcda $(TEST_DIR)/*.gcno test_file
 
 clean_release:
 	-rm -f $(OBJECTS)
@@ -129,3 +130,4 @@ clean_all:
 	-rm -f $(OBJECTS) $(EXECUTABLE)  $(TEST_DIR)/Gtest_main.o $(TEST_DIR)/unit_test_case.o 
 	-rm -f $(TEST_DIR)/$(FILE_FOR_TESTING)_test.o
 	-rm -f -r $(COV_OUTPUT)/* $(GTEST_LIB)/* test_file
+	-rm -f $(TEST_DIR)/*.gcda $(TEST_DIR)/*.gcno $(GTEST_LIB)/* test_file

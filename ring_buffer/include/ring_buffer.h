@@ -1,4 +1,6 @@
-
+#include <assert.h>
+#include <stdio.h>
+#include <stdlib.h>
 #define BUFFER_LENGHT 10
 #define BUFFER_LAST_ELEMENT BUFFER_LENGHT-1
 
@@ -12,32 +14,49 @@ typedef unsigned int uint32_t;
 typedef int int32_t;
 
 
-typedef struct Ring_buffer{
-    size_t rb_size;
-    // read from tail
-    uint8_t * buffer_tail;
-    // write to head
-    uint8_t * buffer_head;
+#define MAX_BUFFER 10 ///< Length of global buffer space
 
-    uint8_t * buffer_start;
-    uint8_t * buffer_end;
+#define OK 1     ///< OK
+#define ERROR -1 ///< Error
 
-    uint8_t buffer_full;
-    uint8_t buffer_empty;
+#define BUFF_LEN(a, b) a < b ? b - a : a - b
 
-    uint8_t overwrite_on_off;
+//! \enum error_type enumerators for error conditions
+enum error_type {
+    BUFF_OK,        /*! No error */
+    BUFFER_EMPTY,   /*! Buffer is empty */
+    BUFFER_FULL,    /*! Buffer is full */
+    BUFFER_OVERRUN, /*! Try to read over buffer end */
+    BUFFER_ERROR,
+    UNKNOWN_ERROR
+};
 
-} ring_buffer_uint8_t;
+/*
+\struct buffer_type
+*/
+struct buffer_type {
+    uint8_t *head;   ///< Current adding position of the buffer
+    uint8_t *tail;   ///< Currently last entry
+    uint8_t *buffer; ///< Pointer to buffer
+};
 
+void init_buffer(struct buffer_type *b, uint8_t *buffer);
 
+void empty_buffer(struct buffer_type *b);
 
-void init_rb(ring_buffer_uint8_t * rb_data, uint8_t * buffer_start, uint8_t * buffer_end, uint8_t overwrite);
-void write_byte_to_rb(ring_buffer_uint8_t * rb_data, uint8_t data);
-uint8_t read_byte_from_rb(ring_buffer_uint8_t * rb_data);
-void read_all_data(ring_buffer_uint8_t * rb_data, uint8_t * dest_buffer);
-// uint8_t read_n_bytes_from_rb(ring_buffer_uint8_t * rb_data, uint8_t * dest_buffer, uint8_t bytes);  not done
+enum error_type create_buffer(struct buffer_type *b, int size);
+int add_char_to_buffer(struct buffer_type *b, uint8_t c, enum error_type *err);
+uint8_t get_char_from_buffer(struct buffer_type *b, enum error_type *err);
+int add_string_to_buffer(struct buffer_type *b, uint8_t *s, enum error_type *err);
+uint8_t get_string_from_buffer(struct buffer_type *b, uint8_t *s,
+                            enum error_type *err);
+int get_buffer_state(struct buffer_type b);
+void print_buffer(struct buffer_type b);
+uint8_t *move_pointer_to_next(struct buffer_type *b, uint8_t *p);
 
-void clear_rb(ring_buffer_uint8_t * rb_data);
-void print_rb(ring_buffer_uint8_t * rb_data);
+enum error_type is_buffer_full(struct buffer_type *b);
+enum error_type is_buffer_empty(struct buffer_type *b);
+int get_buffer_length(struct buffer_type *b);
 
-// uint8_t buffer[BUFFER_LENGHT];
+extern uint8_t transmission_buffer[MAX_BUFFER];
+extern uint8_t recive_buffer[MAX_BUFFER];

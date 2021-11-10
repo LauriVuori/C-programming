@@ -1,64 +1,52 @@
 #include <gtest/gtest.h>
 #include <stdio.h>
-// #include "../include/ring_buffer.h"
 #include "../src/ring_buffer.c"
 
-// TEST(MytestCategory,MyTest1)
-// {
-// 	float test_data[]={0,1,2,3,4,5,6,7,8,9,0};
-// 	float average;
-
-// 	average=calc_average(test_data,10);
-	
-//     EXPECT_EQ(4.5, average);
-// }
-
-
-TEST(init_ringbuffer, first_init) {
-	ring_buffer_uint8_t buffer_data;
-
-	uint8_t test_buff[BUFFER_LENGHT];
-
-	init_rb(&buffer_data, &test_buff[0], &test_buff[BUFFER_LAST_ELEMENT], 0);
-
-	// buffer head and tail should start from beginning of buffer
-	EXPECT_EQ(buffer_data.buffer_head, test_buff);
-	EXPECT_EQ(buffer_data.buffer_tail, test_buff);
-	// buffer start should point in beginning of buffer
-	EXPECT_EQ(buffer_data.buffer_start, test_buff);
-	// buffer end should point end of buffer
-	EXPECT_EQ(buffer_data.buffer_end, &test_buff[BUFFER_LAST_ELEMENT]);
-}
-
-
-/*-----------------------------------------------------*/
-TEST(RingBuffer_empty_buffer, add_empty)
+TEST(RingBuffer_init_buffer, first_init)
 {
-    ring_buffer_uint8_t buffer_data;
-    uint8_t test_buff[BUFFER_LENGHT];
-    int err;
-    int i, len;
+  struct buffer_type b;
 
-    init_rb(&buffer_data, &test_buff[0], &test_buff[BUFFER_LAST_ELEMENT], 0);
+  uint8_t buff[MAX_BUFFER];
 
-    for (i = 1; i <= BUFFER_LENGHT-1; i++) {
+  init_buffer(&b, buff);
 
-        // len = write_byte_to_rb(&buffer_data, 'a' + (i - 1), &err);
-        write_byte_to_rb(&buffer_data, 'a' + (i - 1));
-
-        EXPECT_EQ(buffer_data.buffer_head, test_buff + i * sizeof(unsigned char));
-        EXPECT_EQ(buffer_data.buffer_tail, test_buff);
-        EXPECT_EQ(buffer_data.buffer_start, test_buff);
-    }
-
-    clear_rb(&buffer_data);
-
-    EXPECT_EQ(buffer_data.buffer_head, buffer_data.buffer_tail);
-    EXPECT_EQ(buffer_data.buffer_head, test_buff + (BUFFER_LENGHT-1) * sizeof(unsigned char));
-    EXPECT_EQ(buffer_data.buffer_tail, test_buff + (BUFFER_LENGHT-1) * sizeof(unsigned char));
-    EXPECT_EQ(buffer_data.buffer_start, test_buff);
+  EXPECT_EQ(b.head, buff);
+  EXPECT_EQ(b.tail, buff);
+  EXPECT_EQ(b.buffer, buff);
 
 }
+
+
+
+
+
+
+// /*-----------------------------------------------------*/
+// TEST(RingBuffer_empty_buffer, add_empty){
+//     struct buffer_type b;
+//     uint8_t buff[MAX_BUFFER];
+//     int err;
+//     int i, len;
+
+//     init_buffer(&b, buff);
+
+//     for (i = 1; i <= MAX_BUFFER-1; i++) {
+
+//         len = add_char_to_buffer(&b, 'a' + (i - 1), (enum error_type*)&err);
+
+//         EXPECT_EQ(b.head, buff + i * sizeof(uint8_t));
+//         EXPECT_EQ(b.tail, buff);
+//         EXPECT_EQ(b.buffer, buff);
+//     }
+
+//     empty_buffer(&b);
+
+//     // EXPECT_EQ(b.head, b.tail);
+//     // EXPECT_EQ(b.head, buff + (MAX_BUFFER-1) * sizeof(uint8_t));
+//     // EXPECT_EQ(b.tail, buff + (MAX_BUFFER-1) * sizeof(uint8_t));
+//     // EXPECT_EQ(b.buffer, buff);
+
+// }
 
 
 // /****************************************************************************/
