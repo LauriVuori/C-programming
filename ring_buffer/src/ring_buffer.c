@@ -1,6 +1,5 @@
 #include <stdio.h>
-#include "../include/ring_buffer.h"
-
+#include "../include/include.h"
 void init_buffer(struct buffer_type *b, uint8_t *buffer) {
     b->buffer = buffer;
     b->head = buffer;

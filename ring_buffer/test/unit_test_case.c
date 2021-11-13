@@ -1,6 +1,6 @@
 #include <gtest/gtest.h>
 #include <stdio.h>
-#include "../src/ring_buffer.c"
+#include "../include/include.h"
 
 TEST(RingBuffer_init_buffer, first_init)
 {
@@ -13,7 +13,6 @@ TEST(RingBuffer_init_buffer, first_init)
   EXPECT_EQ(b.head, buff);
   EXPECT_EQ(b.tail, buff);
   EXPECT_EQ(b.buffer, buff);
-
 }
 
 

@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include "../include/ring_buffer.h"
+#include "../include/include.h"
 
 
 uint8_t transmission_buffer[MAX_BUFFER];
@@ -10,6 +10,7 @@ int main(void) {
     int err;
     int i, len;
 
+    printf("THIS IS MAIN\n");
 
     // init_buffer(&tb,transmission_buffer);
     // len = add_char_to_buffer(&tb, 'a', (enum error_type*)&err);
