@@ -38,26 +38,27 @@ enum error_type {
 struct buffer_type {
     uint8_t *head;   ///< Current adding position of the buffer
     uint8_t *tail;   ///< Currently last entry
-    uint8_t *buffer; ///< Pointer to buffer
+    uint8_t *buffer_start; ///< Pointer to buffer
+    uint8_t *buffer_end; ///< Pointer to end of buffer
 };
 
-void init_buffer(struct buffer_type *b, uint8_t *buffer);
+void init_buffer(struct buffer_type *r_buffer, uint8_t *buffer_start, uint8_t *buffer_end);
 
-void empty_buffer(struct buffer_type *b);
+void empty_buffer(struct buffer_type *r_buffer);
 
-enum error_type create_buffer(struct buffer_type *b, int size);
-int add_char_to_buffer(struct buffer_type *b, uint8_t c, enum error_type *err);
-uint8_t get_char_from_buffer(struct buffer_type *b, enum error_type *err);
-int add_string_to_buffer(struct buffer_type *b, uint8_t *s, enum error_type *err);
-uint8_t get_string_from_buffer(struct buffer_type *b, uint8_t *s,
+enum error_type create_buffer(struct buffer_type *r_buffer, int size);
+int add_byte_to_buffer(struct buffer_type *r_buffer, uint8_t byte, enum error_type *err);
+uint8_t get_char_from_buffer(struct buffer_type *r_bufferb, enum error_type *err);
+int add_string_to_buffer(struct buffer_type *r_buffer, uint8_t *s, enum error_type *err);
+uint8_t get_string_from_buffer(struct buffer_type *r_buffer, uint8_t *s,
                             enum error_type *err);
-int get_buffer_state(struct buffer_type b);
-void print_buffer(struct buffer_type b);
-uint8_t *move_pointer_to_next(struct buffer_type *b, uint8_t *p);
+int get_buffer_state(struct buffer_type r_buffer);
+void print_buffer(struct buffer_type r_buffer);
+uint8_t *move_pointer_to_next(struct buffer_type *r_buffer, uint8_t *p);
 
-enum error_type is_buffer_full(struct buffer_type *b);
-enum error_type is_buffer_empty(struct buffer_type *b);
-int get_buffer_length(struct buffer_type *b);
+enum error_type is_buffer_full(struct buffer_type *r_buffer);
+enum error_type is_buffer_empty(struct buffer_type *r_buffer);
+int get_buffer_length(struct buffer_type *r_buffer);
 
 extern uint8_t transmission_buffer[MAX_BUFFER];
 extern uint8_t recive_buffer[MAX_BUFFER];

@@ -2,25 +2,58 @@
 #include <stdio.h>
 #include "../include/include.h"
 
-TEST(RingBuffer_init_buffer, first_init)
-{
-  struct buffer_type b;
+TEST(init_ringbuffer, first_test) {
+    struct buffer_type r_buffer;
 
-  uint8_t buff[MAX_BUFFER];
+    uint8_t test_buff[MAX_BUFFER];
 
-  init_buffer(&b, buff);
+    init_buffer(&r_buffer, test_buff, &test_buff[MAX_BUFFER-1]);
 
-  EXPECT_EQ(b.head, buff);
-  EXPECT_EQ(b.tail, buff);
-  EXPECT_EQ(b.buffer, buff);
+    EXPECT_EQ(r_buffer.head, test_buff);
+    EXPECT_EQ(r_buffer.tail, test_buff);
+    EXPECT_EQ(r_buffer.buffer_start, test_buff);
+    EXPECT_EQ(r_buffer.buffer_end, test_buff + MAX_BUFFER-1);
+
+    //Asserts
+    init_buffer(&r_buffer, test_buff, &test_buff[MAX_BUFFER-1]);
+    assert(r_buffer.head == test_buff);
+    assert(r_buffer.tail == test_buff);
+    assert(r_buffer.buffer_start == test_buff);
+    assert(r_buffer.buffer_end == test_buff + MAX_BUFFER-1);
 }
 
 
+// TEST(get_ringbuffer_state, basic_test) {
+//     struct buffer_type r_buffer;
+//     uint8_t test_buff[MAX_BUFFER];
+
+//     int state;
+//     int err;
+
+//     r.buffer = rx_buffer;
+
+//     for (int i = 0; i < 10; i++) {
+
+//     }
+// //     r.head=rx_buffer+15;       /* OR  r.head=&rx_buffer[15]; */
+// //     r.tail=rx_buffer+2
+
+// //     state=get_buffer_state(&r,&err);
+
+// //  /* Expected result */
+// //     EXPECT_EQ(state, 13);
+// //     EXPECT_EQ(err, OK);
+
+// //  /* These should not have moved at all*/
+// //     EXPECT_EQ(r.head, rx_buffer+15);
+// //     EXPECT_EQ(r.tail, rx_buffer+2);
+// //     EXPECT_EQ(r.buffer, rx_buffer);
+
+// }
 
 
 
-
-// /*-----------------------------------------------------*/
+// // /*-----------------------------------------------------*/
 // TEST(RingBuffer_empty_buffer, add_empty){
 //     struct buffer_type b;
 //     uint8_t buff[MAX_BUFFER];

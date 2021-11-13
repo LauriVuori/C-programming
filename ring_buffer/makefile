@@ -38,16 +38,18 @@ OBJECTS := $(patsubst %.$(FILETYPE),%.o,$(wildcard $(SRC)/*.$(FILETYPE)))
 $(PROJ_EXECUTABLE) : $(OBJECTS)
 		$(CC) $(OBJECTS) -o $@ $(LIBS) -lpthread
 
+# $(CC) -g $(OBJECTS) -o main.exe $(LIBS)
+win: $(OBJECTS)
+	gcc -g -c -I./include -lpthread src/main.c -o src/main.o
+	gcc -g -c -I./include -lpthread src/ring_buffer.c -o src/ring_buffer.o
+	gcc -g ./src/main.o ./src/ring_buffer.o -o ./src/debug.exe
+
 all: $(OBJECTS) $(PROJ_EXECUTABLE)
 
 .$(FILETYPE).o: *.h
 	$(CC) $(CFLAGS) $< -o $@
 
-clean:
-	-rm -f $(OBJECTS) $(PROJ_EXECUTABLE) $(TEST_DIR)/*.o $(TEST_DIR)/*.gcda $(TEST_DIR)/*.gcno
-	# -rm -f $(OBJECTS) $(PROJ_EXECUTABLE)  $(TEST_DIR)/Gtest_main.o $(TEST_DIR)/unit_test_case.o 
-	# -rm -f $(TEST_DIR)/$(FILE_FOR_TESTING)_test.o
-	# -rm -f $(TEST_DIR)/*.gcda $(TEST_DIR)/*.gcno test_file
+
 
 # ################### Google Test framework #######################
 # # ifdef LOCAL
@@ -66,17 +68,9 @@ TEST_DIR=./test
 COPTS= -Wall -fpermissive
 COPTS_COV= $(COPTS) -fprofile-arcs -ftest-coverage
 # LDFLAGS=-fprofile-arcs -ftest-coverage
-# COV_OUTPUT=./cov_output
+COV_OUTPUT=./cov_output
 
-# TEST_DIR = ./test
-# # change location of lib
-# test: Gtest_main.o unit_test_case.o $(FILE_FOR_TESTING)_test.o $(GTEST_LIB)/libgtest.a  
-# 	g++  $(COPTS) -pthread $(TEST_DIR)/Gtest_main.o $(TEST_DIR)/unit_test_case.o $(TEST_DIR)/$(FILE_FOR_TESTING)_test.o $(GTEST_LIB)/libgtest.a -o $(TEST_FILE)
-
-# $(GTEST_LIB)/libgtest.a:
-# 	g++ -isystem $(GTEST_INCLUDE) -pthread -c $(GTEST_DIR)/src/gtest-all.cc -o $(GTEST_LIB)/gtest-all.o
-
-test: $(TEST_DIR)/Gtest_main.o $(TEST_DIR)/unit_test_case.o $(TEST_DIR)/$(FILE_FOR_TESTING)_test.o $(GTEST_LIB)/libgtest.a
+test: $(TEST_DIR)/Gtest_main.o $(TEST_DIR)/unit_test_case.o $(TEST_DIR)/$(FILE_FOR_TESTING)_test.o $(GTEST_LIB)/libgtest.a 
 	g++  $(COPTS_COV) -pthread $(TEST_DIR)/$(FILE_FOR_TESTING)_test.o $(TEST_DIR)/unit_test_case.o $(TEST_DIR)/Gtest_main.o $(GTEST_LIB)/libgtest.a -o unit_tests
 
 $(GTEST_LIB)/libgtest.a:
@@ -92,10 +86,18 @@ $(TEST_DIR)/unit_test_case.o: $(TEST_DIR)/unit_test_case.$(FILETYPE)
 $(TEST_DIR)/$(FILE_FOR_TESTING)_test.o: $(SRC)/$(FILE_FOR_TESTING).$(FILETYPE)
 	g++  -c $(COPTS_COV) $(SRC)/$(FILE_FOR_TESTING).$(FILETYPE) -o $(TEST_DIR)/$(FILE_FOR_TESTING)_test.o
 
-report: rm_gmain
+report:
+	-rm -f $(TEST_DIR)/Gtest_main.gcda $(TEST_DIR)/Gtest_main.gcno $(TEST_DIR)/unit_test_case.gcda $(TEST_DIR)/unit_test_case.gcno
 	lcov -rc lcov_branch_coverage=1 -c -i -d . -o .coverage.base
 	lcov -rc lcov_branch_coverage=1 -c -d . -o .coverage.run
 	lcov -rc lcov_branch_coverage=1 -d . -a .coverage.base -a .coverage.run -o .coverage.total
 	genhtml --branch-coverage -o $(COV_OUTPUT) .coverage.total
-	# rm -f .coverage.base .coverage.run .coverage.total
-	# rm -f ringbuffer_test.gcda ringbuffer_test.gcno
+	rm -f .coverage.base .coverage.run .coverage.total
+
+clean:
+	-rm -f $(OBJECTS) $(PROJ_EXECUTABLE) $(TEST_DIR)/*.o $(TEST_DIR)/*.gcda $(TEST_DIR)/*.gcno unit_tests
+	-rm -f .coverage.base .coverage.run .coverage.total
+	-rm -f $(SRC)/debug.exe
+
+clean_units:
+	-rm -f $(TEST_DIR)/*.gcda $(TEST_DIR)/*.gcno

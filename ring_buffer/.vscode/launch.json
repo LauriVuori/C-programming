@@ -9,7 +9,7 @@
             "type": "cppdbg",
             "request": "launch",
             // "program": "${fileDirname}\\.\test.exe",
-            "program": "${fileDirname}\\main.exe",
+            "program": "${fileDirname}\\debug.exe",
             "args": [],
             "stopAtEntry": false,
             "cwd": "C:/MinGW/bin",
@@ -25,5 +25,6 @@
                 }
             ],
         }
+            
     ]
 }

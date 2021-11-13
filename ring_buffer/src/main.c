@@ -12,7 +12,9 @@ int main(void) {
 
     printf("THIS IS MAIN\n");
 
-    // init_buffer(&tb,transmission_buffer);
+    init_buffer(&tb,transmission_buffer, &transmission_buffer[MAX_BUFFER-1]);
+    
+    print_buffer(tb);
     // len = add_char_to_buffer(&tb, 'a', (enum error_type*)&err);
     // print_buffer(tb);
     // ring_buffer_uint8_t rb_data;
