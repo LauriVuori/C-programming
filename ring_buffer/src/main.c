@@ -12,8 +12,11 @@ int main(void) {
 
     printf("THIS IS MAIN\n");
 
-    init_buffer(&tb,transmission_buffer, &transmission_buffer[MAX_BUFFER-1]);
-    
+    init_buffer(&tb,transmission_buffer, &transmission_buffer[MAX_BUFFER-1], 0);
+    for (int i = 0; i < 5; i++) {
+        add_byte_to_buffer(&tb, i + 'a',(enum error_type*)&err);
+    }
+    check_byte_count_in_buffer(&tb);
     print_buffer(tb);
     // len = add_char_to_buffer(&tb, 'a', (enum error_type*)&err);
     // print_buffer(tb);

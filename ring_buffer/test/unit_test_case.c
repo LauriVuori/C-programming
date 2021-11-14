@@ -7,7 +7,7 @@ TEST(init_ringbuffer, first_test) {
 
     uint8_t test_buff[MAX_BUFFER];
 
-    init_buffer(&r_buffer, test_buff, &test_buff[MAX_BUFFER-1]);
+    init_buffer(&r_buffer, test_buff, &test_buff[MAX_BUFFER-1], 0);
 
     EXPECT_EQ(r_buffer.head, test_buff);
     EXPECT_EQ(r_buffer.tail, test_buff);
@@ -15,7 +15,7 @@ TEST(init_ringbuffer, first_test) {
     EXPECT_EQ(r_buffer.buffer_end, test_buff + MAX_BUFFER-1);
 
     //Asserts
-    init_buffer(&r_buffer, test_buff, &test_buff[MAX_BUFFER-1]);
+    init_buffer(&r_buffer, test_buff, &test_buff[MAX_BUFFER-1], 0);
     assert(r_buffer.head == test_buff);
     assert(r_buffer.tail == test_buff);
     assert(r_buffer.buffer_start == test_buff);
@@ -23,33 +23,36 @@ TEST(init_ringbuffer, first_test) {
 }
 
 
-// TEST(get_ringbuffer_state, basic_test) {
-//     struct buffer_type r_buffer;
-//     uint8_t test_buff[MAX_BUFFER];
+TEST(get_ringbuffer_state, basic_test) {
+    struct buffer_type r_buffer;
+    uint8_t test_buff[MAX_BUFFER];
+    for (int i = 0; i < 10; i++) {
+        test_buff[i] = '\0';
+    }
+    int state;
+    int err;
 
-//     int state;
-//     int err;
+    init_buffer(&r_buffer, test_buff, &test_buff[MAX_BUFFER-1], 0);
 
-//     r.buffer = rx_buffer;
+    for (int i = 0; i < 5; i++) {
+        add_byte_to_buffer(&r_buffer, i + 'a',(enum error_type*)&err);
+    }
+    print_buffer(r_buffer);
+//     r.head=rx_buffer+15;       /* OR  r.head=&rx_buffer[15]; */
+//     r.tail=rx_buffer+2
 
-//     for (int i = 0; i < 10; i++) {
+//     state=get_buffer_state(&r,&err);
 
-//     }
-// //     r.head=rx_buffer+15;       /* OR  r.head=&rx_buffer[15]; */
-// //     r.tail=rx_buffer+2
+//  /* Expected result */
+//     EXPECT_EQ(state, 13);
+//     EXPECT_EQ(err, OK);
 
-// //     state=get_buffer_state(&r,&err);
+//  /* These should not have moved at all*/
+//     EXPECT_EQ(r.head, rx_buffer+15);
+//     EXPECT_EQ(r.tail, rx_buffer+2);
+//     EXPECT_EQ(r.buffer, rx_buffer);
 
-// //  /* Expected result */
-// //     EXPECT_EQ(state, 13);
-// //     EXPECT_EQ(err, OK);
-
-// //  /* These should not have moved at all*/
-// //     EXPECT_EQ(r.head, rx_buffer+15);
-// //     EXPECT_EQ(r.tail, rx_buffer+2);
-// //     EXPECT_EQ(r.buffer, rx_buffer);
-
-// }
+}
 
 
 
