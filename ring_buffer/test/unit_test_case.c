@@ -1,14 +1,14 @@
 #include <gtest/gtest.h>
 #include <stdio.h>
 #include "../include/include.h"
+// Assertions Reference
+// https://google.github.io/googletest/reference/assertions.html
 
 TEST(init_ringbuffer, first_test) {
     struct buffer_type r_buffer;
-
     uint8_t test_buff[MAX_BUFFER];
 
     init_buffer(&r_buffer, test_buff, &test_buff[MAX_BUFFER-1], 0);
-
     EXPECT_EQ(r_buffer.head, test_buff);
     EXPECT_EQ(r_buffer.tail, test_buff);
     EXPECT_EQ(r_buffer.buffer_start, test_buff);
@@ -23,21 +23,67 @@ TEST(init_ringbuffer, first_test) {
 }
 
 
-TEST(get_ringbuffer_state, basic_test) {
+TEST(count_unread_bytes, basic_test) {
     struct buffer_type r_buffer;
     uint8_t test_buff[MAX_BUFFER];
     for (int i = 0; i < 10; i++) {
         test_buff[i] = '\0';
     }
+
     int state;
+    int err_msg;
     int err;
+    int number_unread_bits = 0;
 
     init_buffer(&r_buffer, test_buff, &test_buff[MAX_BUFFER-1], 0);
 
     for (int i = 0; i < 5; i++) {
+        err = add_byte_to_buffer(&r_buffer, i + 'a', (enum error_type*)&err_msg);
+        if (err == ERROR) {
+            EXPECT_EQ(err_msg, 2);
+        }
+    }
+    // print_buffer(r_buffer);
+    number_unread_bits = check_byte_count_in_buffer(&r_buffer);
+    EXPECT_EQ(r_buffer.tail, r_buffer.buffer_start);
+    EXPECT_EQ(number_unread_bits, 5);
+    EXPECT_EQ(r_buffer.tail, r_buffer.buffer_start);
+    // <0,a><1,b><2,c><3,d><4,e><5, ><6, ><7, ><8, ><9, >
+    //                            H
+    //   T
+    for (int i = 0; i < 10; i++) {
         add_byte_to_buffer(&r_buffer, i + 'a',(enum error_type*)&err);
     }
-    print_buffer(r_buffer);
+    r_buffer.tail += 6;
+    // <0,f><1,g><2,h><3,i><4,j><5,a><6,b><7,c><8,d><9,e>
+    //                            H
+    //                                 T
+    EXPECT_EQ(check_byte_count_in_buffer(&r_buffer), 9);
+    r_buffer.tail -= 2;
+    EXPECT_EQ(check_byte_count_in_buffer(&r_buffer), 1);
+}
+
+TEST(buffer_full_and_overwrite, basic_test) {
+    struct buffer_type r_buffer;
+    uint8_t test_buff[MAX_BUFFER];
+    int err;
+    int err_msg;
+    init_buffer(&r_buffer, test_buff, &test_buff[MAX_BUFFER-1], 0);
+
+    for (int i = 0; i < 10; i++) {
+        test_buff[i] = '\0';
+    }
+
+    for (int i = 0; i < 9; i++) {
+        err = add_byte_to_buffer(&r_buffer, i + 'a',(enum error_type*)&err_msg);
+        if (err == ERROR) {
+            EXPECT_EQ(err_msg, 2);
+        }
+        print_buffer(r_buffer);
+    }
+
+}
+
 //     r.head=rx_buffer+15;       /* OR  r.head=&rx_buffer[15]; */
 //     r.tail=rx_buffer+2
 
@@ -51,8 +97,6 @@ TEST(get_ringbuffer_state, basic_test) {
 //     EXPECT_EQ(r.head, rx_buffer+15);
 //     EXPECT_EQ(r.tail, rx_buffer+2);
 //     EXPECT_EQ(r.buffer, rx_buffer);
-
-}
 
 
 

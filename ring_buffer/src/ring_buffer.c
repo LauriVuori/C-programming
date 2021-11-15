@@ -25,11 +25,12 @@ int add_byte_to_buffer(struct buffer_type *r_buffer, uint8_t byte, enum error_ty
                     r_buffer->tail += 1;
                 }
             }
+            else {
+                *err = BUFFER_FULL;
+                return -1;
+            }
         }
-        else {
-            *err = BUFFER_FULL;
-            return -1;
-        }
+
     }
     else {
         r_buffer->head = r_buffer->buffer_start;
@@ -38,30 +39,40 @@ int add_byte_to_buffer(struct buffer_type *r_buffer, uint8_t byte, enum error_ty
     *err = BUFF_OK;
 }
 
+// int check_byte_count_in_buffer(struct buffer_type *r_buffer) {
+//     uint8_t *test;
+//     uint8_t counter = 0;
+//     uint8_t multiplier = 0;
+//     test = r_buffer->tail;
+//     while (test != r_buffer->head){
+//         counter++;
+//         test++;
+//         print_buffer(*r_buffer);
+//         if (test == r_buffer->buffer_end) {
+//             test = r_buffer->buffer_start;
+//         }
+//     }
+//     return counter;
+// }
 int check_byte_count_in_buffer(struct buffer_type *r_buffer) {
-    uint8_t *test;
+    uint8_t *ptr;
     uint8_t counter = 0;
     uint8_t multiplier = 0;
-    test = r_buffer->tail;
-    while (test != r_buffer->head){
-        if (counter == 255) {
-            multiplier++;
-            counter = 0;
+    ptr = r_buffer->tail;
+    while (ptr != r_buffer->head){
+        // print_buffer(*r_buffer);
+        // printf("COUNTER:%d", counter);
+        if (ptr == r_buffer->buffer_end) {
+            counter++;
+            ptr = r_buffer->buffer_start;
         }
         else {
-            
+            counter++;
+            ptr++;
         }
-        if (test == r_buffer->buffer_end) {
-            test = r_buffer->buffer_start;
-        }
-        else {
-            test++;
-        }
-
-        
     }
+    return counter;
 }
-
 void empty_buffer(struct buffer_type *r_buffer) {
 
 }
@@ -109,6 +120,7 @@ void print_buffer(struct buffer_type r_buffer) {
             printf("     ");
         }
     }
+    printf("\n");
     // printf("<<%d>>", *r_buffer.buffer_start);
 }
 uint8_t *move_pointer_to_next(struct buffer_type *r_buffer, uint8_t *p)

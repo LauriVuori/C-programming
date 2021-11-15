@@ -12,6 +12,9 @@
 # make test
 # make report
 
+# hae gitistä gframework
+
+
 PROJ_EXECUTABLE = main_release
 FILE_FOR_TESTING = ring_buffer
 
@@ -78,16 +81,16 @@ $(GTEST_LIB)/libgtest.a:
 	ar -rv  $(GTEST_LIB)/libgtest.a $(GTEST_LIB)/gtest-all.o
 
 $(TEST_DIR)/Gtest_main.o: $(TEST_DIR)/Gtest_main.c
-	g++ -c $(COPTS_COV) $(TEST_DIR)/Gtest_main.c $(GTEST_INCLUDE) -o $(TEST_DIR)/Gtest_main.o
+	g++ -c $(TEST_DIR)/Gtest_main.c $(GTEST_INCLUDE) -o $(TEST_DIR)/Gtest_main.o
 
 $(TEST_DIR)/unit_test_case.o: $(TEST_DIR)/unit_test_case.$(FILETYPE)
-	g++ -c $(COPTS_COV) $(TEST_DIR)/unit_test_case.$(FILETYPE) $(GTEST_INCLUDE) -o $(TEST_DIR)/unit_test_case.o
+	g++ -c $(TEST_DIR)/unit_test_case.$(FILETYPE) $(GTEST_INCLUDE) -o $(TEST_DIR)/unit_test_case.o
 
 $(TEST_DIR)/$(FILE_FOR_TESTING)_test.o: $(SRC)/$(FILE_FOR_TESTING).$(FILETYPE)
 	g++  -c $(COPTS_COV) $(SRC)/$(FILE_FOR_TESTING).$(FILETYPE) -o $(TEST_DIR)/$(FILE_FOR_TESTING)_test.o
 
 report:
-	-rm -f $(TEST_DIR)/Gtest_main.gcda $(TEST_DIR)/Gtest_main.gcno $(TEST_DIR)/unit_test_case.gcda $(TEST_DIR)/unit_test_case.gcno
+# -rm -f $(TEST_DIR)/Gtest_main.gcda $(TEST_DIR)/Gtest_main.gcno $(TEST_DIR)/unit_test_case.gcda $(TEST_DIR)/unit_test_case.gcno
 	lcov -rc lcov_branch_coverage=1 -c -i -d . -o .coverage.base
 	lcov -rc lcov_branch_coverage=1 -c -d . -o .coverage.run
 	lcov -rc lcov_branch_coverage=1 -d . -a .coverage.base -a .coverage.run -o .coverage.total
