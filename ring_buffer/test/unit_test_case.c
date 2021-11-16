@@ -4,22 +4,51 @@
 // Assertions Reference
 // https://google.github.io/googletest/reference/assertions.html
 
-TEST(init_ringbuffer, first_test) {
+TEST(init_ringbuffer_test, function_test) {
     struct buffer_type r_buffer;
     uint8_t test_buff[MAX_BUFFER];
 
-    init_buffer(&r_buffer, test_buff, &test_buff[MAX_BUFFER-1], 0);
+    // Start tests
+    init_buffer(&r_buffer, test_buff, &test_buff[MAX_BUFFER-1]);
     EXPECT_EQ(r_buffer.head, test_buff);
     EXPECT_EQ(r_buffer.tail, test_buff);
     EXPECT_EQ(r_buffer.buffer_start, test_buff);
     EXPECT_EQ(r_buffer.buffer_end, test_buff + MAX_BUFFER-1);
 
     //Asserts
-    init_buffer(&r_buffer, test_buff, &test_buff[MAX_BUFFER-1], 0);
+    init_buffer(&r_buffer, test_buff, &test_buff[MAX_BUFFER-1]);
     assert(r_buffer.head == test_buff);
     assert(r_buffer.tail == test_buff);
     assert(r_buffer.buffer_start == test_buff);
     assert(r_buffer.buffer_end == test_buff + MAX_BUFFER-1);
+}
+
+TEST(add_byte_to_buffer_test, function_test) {
+    struct buffer_type r_buffer;
+    uint8_t test_buff[MAX_BUFFER];
+    int err_msg;
+    int err;
+    for (int i = 0; i < 10; i++) {
+        test_buff[i] = '\0';
+    }
+    init_buffer(&r_buffer, test_buff, &test_buff[MAX_BUFFER-1]);
+    // Start tests
+    for (int i = 0; i < 5; i++) {
+        add_byte_to_buffer(&r_buffer, i + 'a', (enum error_type*)&err_msg);
+    }
+
+    // test if there is error when head is in last element and tail is in first. 
+    // Then we move tail once and proceed to write byte
+    EXPECT_EQ(r_buffer.head, r_buffer.buffer_start+5);
+    for (int i = 0; i < 6; i++) {
+        err = add_byte_to_buffer(&r_buffer, i + 'a', (enum error_type*)&err_msg);
+        if (err == ERROR) {
+            EXPECT_EQ(err_msg, BUFFER_FULL);
+            r_buffer.tail++;
+        }
+    }
+    EXPECT_EQ(r_buffer.head+1, r_buffer.tail);
+
 }
 
 
@@ -35,54 +64,59 @@ TEST(count_unread_bytes, basic_test) {
     int err;
     int number_unread_bits = 0;
 
-    init_buffer(&r_buffer, test_buff, &test_buff[MAX_BUFFER-1], 0);
-
+    init_buffer(&r_buffer, test_buff, &test_buff[MAX_BUFFER-1]);
     for (int i = 0; i < 5; i++) {
-        err = add_byte_to_buffer(&r_buffer, i + 'a', (enum error_type*)&err_msg);
-        if (err == ERROR) {
-            EXPECT_EQ(err_msg, 2);
-        }
+        add_byte_to_buffer(&r_buffer, i + 'a', (enum error_type*)&err_msg);
     }
-    // print_buffer(r_buffer);
     number_unread_bits = check_byte_count_in_buffer(&r_buffer);
-    EXPECT_EQ(r_buffer.tail, r_buffer.buffer_start);
-    EXPECT_EQ(number_unread_bits, 5);
-    EXPECT_EQ(r_buffer.tail, r_buffer.buffer_start);
     // <0,a><1,b><2,c><3,d><4,e><5, ><6, ><7, ><8, ><9, >
-    //                            H
-    //   T
+    //                            H                      
+    //   T 
+    EXPECT_EQ(number_unread_bits, 5);
     for (int i = 0; i < 10; i++) {
-        add_byte_to_buffer(&r_buffer, i + 'a',(enum error_type*)&err);
+        add_byte_to_buffer(&r_buffer, i + 'a', (enum error_type*)&err_msg);
     }
-    r_buffer.tail += 6;
-    // <0,f><1,g><2,h><3,i><4,j><5,a><6,b><7,c><8,d><9,e>
-    //                            H
-    //                                 T
-    EXPECT_EQ(check_byte_count_in_buffer(&r_buffer), 9);
-    r_buffer.tail -= 2;
-    EXPECT_EQ(check_byte_count_in_buffer(&r_buffer), 1);
+    number_unread_bits = check_byte_count_in_buffer(&r_buffer);
+    EXPECT_EQ(number_unread_bits, 9);
+    r_buffer.tail += 5;
+    for (int i = 0; i < 10; i++) {
+        add_byte_to_buffer(&r_buffer, i + 'a', (enum error_type*)&err_msg);
+    }
+    number_unread_bits = check_byte_count_in_buffer(&r_buffer);
+    EXPECT_EQ(number_unread_bits, 9);
+    r_buffer.tail = r_buffer.buffer_end;
+    r_buffer.head = r_buffer.buffer_start;
+    print_buffer(r_buffer);
+    number_unread_bits = check_byte_count_in_buffer(&r_buffer);
+    // <0,b><1,c><2,d><3,e><4,e><5,a><6,b><7,c><8,d><9,a>
+    //   H                                               
+    //                                                T
+    EXPECT_EQ(number_unread_bits, 1);
+
 }
 
-TEST(buffer_full_and_overwrite, basic_test) {
-    struct buffer_type r_buffer;
-    uint8_t test_buff[MAX_BUFFER];
-    int err;
-    int err_msg;
-    init_buffer(&r_buffer, test_buff, &test_buff[MAX_BUFFER-1], 0);
+// TEST(buffer_full_and_overwrite, basic_test) {
+//     struct buffer_type r_buffer;
+//     uint8_t test_buff[MAX_BUFFER];
+//     int err;
+//     int err_msg;
+//     init_buffer(&r_buffer, test_buff, &test_buff[MAX_BUFFER-1]);
 
-    for (int i = 0; i < 10; i++) {
-        test_buff[i] = '\0';
-    }
+//     for (int i = 0; i < 10; i++) {
+//         test_buff[i] = '\0';
+//     }
 
-    for (int i = 0; i < 9; i++) {
-        err = add_byte_to_buffer(&r_buffer, i + 'a',(enum error_type*)&err_msg);
-        if (err == ERROR) {
-            EXPECT_EQ(err_msg, 2);
-        }
-        print_buffer(r_buffer);
-    }
+//     for (int i = 0; i < 11; i++) {
+//         err = add_byte_to_buffer(&r_buffer, i + 'a',(enum error_type*)&err_msg);
+//         if (err == ERROR) {
+//             EXPECT_EQ(err_msg, 2);
+//         }
+//         print_buffer(r_buffer);
+//     }
 
-}
+
+
+// }
 
 //     r.head=rx_buffer+15;       /* OR  r.head=&rx_buffer[15]; */
 //     r.tail=rx_buffer+2

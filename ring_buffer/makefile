@@ -47,6 +47,12 @@ win: $(OBJECTS)
 	gcc -g -c -I./include -lpthread src/ring_buffer.c -o src/ring_buffer.o
 	gcc -g ./src/main.o ./src/ring_buffer.o -o ./src/debug.exe
 
+
+debug: $(OBJECTS)
+	gcc -g -c -I./include -lpthread src/main.c -o src/main.o
+	gcc -g -c -I./include -lpthread src/ring_buffer.c -o src/ring_buffer.o
+	gcc -g ./src/main.o ./src/ring_buffer.o -o ./src/debug.out
+
 all: $(OBJECTS) $(PROJ_EXECUTABLE)
 
 .$(FILETYPE).o: *.h
@@ -100,7 +106,7 @@ report:
 clean:
 	-rm -f $(OBJECTS) $(PROJ_EXECUTABLE) $(TEST_DIR)/*.o $(TEST_DIR)/*.gcda $(TEST_DIR)/*.gcno unit_tests
 	-rm -f .coverage.base .coverage.run .coverage.total
-	-rm -f $(SRC)/debug.exe
+	-rm -f $(SRC)/debug.exe $(SRC)/debug.out
 
 clean_units:
 	-rm -f $(TEST_DIR)/*.gcda $(TEST_DIR)/*.gcno

@@ -7,14 +7,18 @@ uint8_t recive_buffer[MAX_BUFFER];
 
 int main(void) {
     struct buffer_type tb;
-    int err;
+    int err_msg, err;
     int i, len;
 
     printf("THIS IS MAIN\n");
 
-    init_buffer(&tb,transmission_buffer, &transmission_buffer[MAX_BUFFER-1], 0);
+    init_buffer(&tb,transmission_buffer, &transmission_buffer[MAX_BUFFER-1]);
     for (int i = 0; i < 15; i++) {
-        add_byte_to_buffer(&tb, i + 'a',(enum error_type*)&err);
+        err = add_byte_to_buffer(&tb, i + 'a',(enum error_type*)&err_msg);
+        if (err == -1) {
+            tb.tail++;
+        }
+        print_buffer(tb);
     }
     // len = check_byte_count_in_buffer(&tb);
 }

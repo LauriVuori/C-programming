@@ -40,10 +40,9 @@ struct buffer_type {
     uint8_t *tail;   ///< Currently last entry
     uint8_t *buffer_start; ///< Pointer to buffer
     uint8_t *buffer_end; ///< Pointer to end of buffer
-    uint8_t overwrite; ///< if head meets tail, return error or move tail. 1 moves tail
 };
 
-void init_buffer(struct buffer_type *r_buffer, uint8_t *buffer_start, uint8_t *buffer_end, uint8_t overwrite);
+void init_buffer(struct buffer_type *r_buffer, uint8_t *buffer_start, uint8_t *buffer_end);
 
 void empty_buffer(struct buffer_type *r_buffer);
 

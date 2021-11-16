@@ -4,8 +4,7 @@
 .vscode/ipch
 .vscode/settings.json
 .vscode/tasks.json
-# ./cov_output
-.g_lib
-cov_output
 g_lib
+# ./cov_output
+cov_output
 .old
