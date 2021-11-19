@@ -25,14 +25,14 @@
 // value: 0 on success, -1 on error.
 
 void debug_print(uint8_t message[]);
-void incoming(uint8_t message[], modbus_t * context_ptr, int receive_con);
+void incoming(uint8_t message[], modbus_t * context_ptr, int * receive_con);
 int main() {
     int socket;
     modbus_t *modb_ctx;
     int receive_con;
     int err;
     modbus_mapping_t *mb_mapping;
-    uint8_t query[MODBUS_TCP_MAX_ADU_LENGTH];
+    
     uint8_t exctracted[MODBUS_TCP_MAX_ADU_LENGTH];
     
     printf(CYN"<%p>\n"RESET, modb_ctx);
@@ -47,10 +47,17 @@ int main() {
     printf(GRN"\nConnection established\n"RESET);
     for(;;) {
         printf("\n loop\n");
+        uint8_t query[MODBUS_TCP_MAX_ADU_LENGTH];
+        incoming(query, modb_ctx, &receive_con);
+        // int a = modbus_receive(modb_ctx, query);
+        if (receive_con >= 0) {
+            modbus_reply(modb_ctx, query, receive_con, mb_mapping);
+        }
+        else {
+            break;
+        }
 
-        incoming(query, modb_ctx, receive_con);
-     
-        modbus_reply(modb_ctx, query, receive_con, mb_mapping);
+         
     }
 
     printf("Quit the loop: %s\n", modbus_strerror(errno));
@@ -68,29 +75,101 @@ int main() {
 }
 // Transaction Id	    Protocol	    Length	    Unit Address	    Message
 //     2 Bytes	          2 Bytes	       2 Bytes	    1 Byte	        N Bytes
-void incoming(uint8_t message[], modbus_t * context_ptr, int receive_con) {
-    uint8_t transaction_id = 0;
+void incoming(uint8_t received_message[], modbus_t * context_ptr, int * receive_con) {
+    uint16_t transaction_id = 0;
     uint16_t protocol = 0;
     uint16_t lenght = 0;
     uint8_t unit_address = 0;
-    uint8_t received_message[250];
+    uint8_t function_code = 0;
+    uint16_t starting_address = 0;
+    uint16_t quantity_of_registers = 0;
+    uint16_t output_value = 0;
+    uint16_t byte_count = 0;
+    uint8_t mb_message[MODBUS_MAX_PDU_LENGTH];
 
     printf("INCOMING--->\n");
-    receive_con = modbus_receive(context_ptr, message);   //Question 9) What does modbus_receive() do?
-    for (int i = 0; i < 20; i++) {
-        received_message[i] = message[i];
-    }
-    if (receive_con >= 0) {
-        // modbus_get_byte_from_bits(const uint8_t *src, int index, unsigned int nb_bits);
-        transaction_id = modbus_get_byte_from_bits(&message[0], 0, 8);
-        printf("<<<<<<<<<<%d>>>><<<%d>>>>\n", transaction_id, message[0]);
+    *receive_con = modbus_receive(context_ptr, received_message);   //Question 9) What does modbus_receive() do?
+    printf("\n");
+    if (*receive_con >= 0) {
+        /************************************ message frame end ******************/
+        transaction_id = (modbus_get_byte_from_bits(received_message, 0, 1) << 8) | (modbus_get_byte_from_bits(received_message, 1, 1));
+        printf(GRN"Transaction id: <%x%x%x%x>\n"RESET, (0x0f & (transaction_id >> 12)), (0x0f & transaction_id >> 8), (0x0f & transaction_id >> 4), (0x0f & transaction_id));
+        protocol = (modbus_get_byte_from_bits(received_message, 2, 1) << 8) | (modbus_get_byte_from_bits(received_message, 3, 1));
+        printf(GRN"Protocol: <%x%x%x%x>\n"RESET, (0x0f & (protocol >> 12)), (0x0f & protocol >> 8), (0x0f & protocol >> 4), (0x0f & protocol));
+        lenght = (modbus_get_byte_from_bits(received_message, 4, 1) << 8) | (modbus_get_byte_from_bits(received_message, 5, 1));
+        printf(GRN"Msg lenght: <%x%x%x%x>\n"RESET, (0x0f & (lenght >> 12)), (0x0f & lenght >> 8), (0x0f & lenght >> 4), (0x0f & lenght));
+        unit_address = modbus_get_byte_from_bits(received_message, 6, 1);
+        printf(GRN"Unit address: <%x%x>\n"RESET, (0x0f & unit_address >> 4), (0x0f & unit_address));
+        function_code = modbus_get_byte_from_bits(received_message, 7, 1);
+        printf(MAG"Function code: <%x%x>\n"RESET, (0x0f & function_code >> 4), (0x0f & function_code));
+        // starting address start from 8
+        if (function_code == MODBUS_FC_READ_COILS) {
+            printf("READ COILS:\n");
+            starting_address = (modbus_get_byte_from_bits(received_message, 8, 1) << 8) | (modbus_get_byte_from_bits(received_message, 9, 1));
+            printf(GRN"Transaction id: <%x%x%x%x>\n"RESET, (0x0f & (starting_address >> 12)), (0x0f & starting_address >> 8), (0x0f & starting_address >> 4), (0x0f & starting_address));
+            quantity_of_registers = (modbus_get_byte_from_bits(received_message, 10, 1) << 8) | (modbus_get_byte_from_bits(received_message, 11, 1));
+            printf(GRN"quantity_of_registers: <%x%x%x%x>\n"RESET, (0x0f & (quantity_of_registers >> 12)), (0x0f & quantity_of_registers >> 8), (0x0f & quantity_of_registers >> 4), (0x0f & quantity_of_registers));
+
+        }
+        else if (function_code == MODBUS_FC_READ_DISCRETE_INPUTS) {
+            printf("\nREAD DISCRETE INPUTS\n");
+            starting_address = (modbus_get_byte_from_bits(received_message, 8, 1) << 8) | (modbus_get_byte_from_bits(received_message, 9, 1));
+            printf(GRN"Starting address: <%x%x%x%x>\n"RESET, (0x0f & (starting_address >> 12)), (0x0f & starting_address >> 8), (0x0f & starting_address >> 4), (0x0f & starting_address));
+            quantity_of_registers = (modbus_get_byte_from_bits(received_message, 10, 1) << 8) | (modbus_get_byte_from_bits(received_message, 11, 1));
+            printf(GRN"quantity_of_registers: <%x%x%x%x>\n"RESET, (0x0f & (quantity_of_registers >> 12)), (0x0f & quantity_of_registers >> 8), (0x0f & quantity_of_registers >> 4), (0x0f & quantity_of_registers));
+        }
+        else if (function_code == MODBUS_FC_READ_HOLDING_REGISTERS) {
+            printf("\nREAD HOLDING REGISTERS\n");
+            starting_address = (modbus_get_byte_from_bits(received_message, 8, 1) << 8) | (modbus_get_byte_from_bits(received_message, 9, 1));
+            printf(GRN"Starting address: <%x%x%x%x>\n"RESET, (0x0f & (starting_address >> 12)), (0x0f & starting_address >> 8), (0x0f & starting_address >> 4), (0x0f & starting_address));
+            quantity_of_registers = (modbus_get_byte_from_bits(received_message, 10, 1) << 8) | (modbus_get_byte_from_bits(received_message, 11, 1));
+            printf(GRN"quantity_of_registers: <%x%x%x%x>\n"RESET, (0x0f & (quantity_of_registers >> 12)), (0x0f & quantity_of_registers >> 8), (0x0f & quantity_of_registers >> 4), (0x0f & quantity_of_registers));
+        }
+        else if (function_code == MODBUS_FC_READ_INPUT_REGISTERS) {
+            printf("\n READ INPUT REGISTERS\n");
+            starting_address = (modbus_get_byte_from_bits(received_message, 8, 1) << 8) | (modbus_get_byte_from_bits(received_message, 9, 1));
+            printf(GRN"Starting address: <%x%x%x%x>\n"RESET, (0x0f & (starting_address >> 12)), (0x0f & starting_address >> 8), (0x0f & starting_address >> 4), (0x0f & starting_address));
+            quantity_of_registers = (modbus_get_byte_from_bits(received_message, 10, 1) << 8) | (modbus_get_byte_from_bits(received_message, 11, 1));
+            printf(GRN"quantity_of_registers: <%x%x%x%x>\n"RESET, (0x0f & (quantity_of_registers >> 12)), (0x0f & quantity_of_registers >> 8), (0x0f & quantity_of_registers >> 4), (0x0f & quantity_of_registers));
+        }
+        else if (function_code == MODBUS_FC_WRITE_SINGLE_COIL) {
+            printf("\nWRITE SINGLE COIL\n");
+            starting_address = (modbus_get_byte_from_bits(received_message, 8, 1) << 8) | (modbus_get_byte_from_bits(received_message, 9, 1));
+            printf(GRN"Starting address: <%x%x%x%x>\n"RESET, (0x0f & (starting_address >> 12)), (0x0f & starting_address >> 8), (0x0f & starting_address >> 4), (0x0f & starting_address));
+            output_value = (modbus_get_byte_from_bits(received_message, 10, 1) << 8) | (modbus_get_byte_from_bits(received_message, 11, 1));
+            printf(GRN"output_value: <%x%x%x%x>\n"RESET, (0x0f & (output_value >> 12)), (0x0f & output_value >> 8), (0x0f & output_value >> 4), (0x0f & output_value));
+        }
+        else if (function_code == MODBUS_FC_WRITE_SINGLE_REGISTER) {
+            printf("\nWRITE SINGLE REGISTERS\n");
+            starting_address = (modbus_get_byte_from_bits(received_message, 8, 1) << 8) | (modbus_get_byte_from_bits(received_message, 9, 1));
+            printf(GRN"Starting address: <%x%x%x%x>\n"RESET, (0x0f & (starting_address >> 12)), (0x0f & starting_address >> 8), (0x0f & starting_address >> 4), (0x0f & starting_address));
+            output_value = (modbus_get_byte_from_bits(received_message, 10, 1) << 8) | (modbus_get_byte_from_bits(received_message, 11, 1));
+            printf(GRN"output_value: <%x%x%x%x>\n"RESET, (0x0f & (output_value >> 12)), (0x0f & output_value >> 8), (0x0f & output_value >> 4), (0x0f & output_value));          
+        }
+        else if (function_code == MODBUS_FC_WRITE_MULTIPLE_COILS) {
+            printf("\nWRITE MULTIPLE COILS\n");
+            starting_address = (modbus_get_byte_from_bits(received_message, 8, 1) << 8) | (modbus_get_byte_from_bits(received_message, 9, 1));
+            printf(GRN"Starting address: <%x%x%x%x>\n"RESET, (0x0f & (starting_address >> 12)), (0x0f & starting_address >> 8), (0x0f & starting_address >> 4), (0x0f & starting_address));
+            quantity_of_registers = (modbus_get_byte_from_bits(received_message, 10, 1) << 8) | (modbus_get_byte_from_bits(received_message, 11, 1));
+            printf(GRN"quantity_of_registers: <%x%x%x%x>\n"RESET, (0x0f & (quantity_of_registers >> 12)), (0x0f & quantity_of_registers >> 8), (0x0f & quantity_of_registers >> 4), (0x0f & quantity_of_registers));
+        }
+        else if (function_code == MODBUS_FC_WRITE_MULTIPLE_REGISTERS) {
+            printf("\nWRITE MULTIPLE REGISTERS\n");
+
+        }
+        
+        /************************************ message frame end ******************/
+        // for (int i = 0; i < lenght-1; i++) {
+        //     mb_message[i] = received_message[7+i];
+        //     printf(YEL"<%x>"RESET,received_message[7+i]);
+        // }
     }
     printf("<------INCOMING\n");
 }
-// void debug_print(uint8_t message[]) {
+// void debug_print(uint8_t received_message[]) {
 //     for (int i = 0; i < MODBUS_TCP_MAX_ADU_LENGTH; i++) {
 //         for (int ii = 0; ii < 12; ii++) {
-//             printf("<%x%x>", (0x0f & (message[i]>>4)), (0x0f & message[i]));
+//             printf("<%x%x>", (0x0f & (received_message[i]>>4)), (0x0f & received_message[i]));
 //             i++;
 //         }
 

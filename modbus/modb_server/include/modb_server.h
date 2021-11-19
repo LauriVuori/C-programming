@@ -5,6 +5,12 @@
 #define PORT 8080
 #define MAX_CONNECTIONS 1
 
+/*modbus functions*/
+
+
+/*modbus functions end*/
+
+
 #define DISCRETE_INPUTS 8 //Read-only
 #define COILS 8 //Read-Write
 #define INPUT_REGISTERS 0 //Read-only

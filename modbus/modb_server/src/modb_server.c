@@ -14,14 +14,13 @@ int initialize(modbus_mapping_t **mb_mapping, modbus_t **modb_ctx,
         return ERROR;
     }
 
-    *mb_mapping = modbus_mapping_new(MODBUS_MAX_READ_BITS, 0,
-                                MODBUS_MAX_READ_REGISTERS, 0);
+    *mb_mapping = modbus_mapping_new(MODBUS_MAX_READ_BITS, MODBUS_MAX_WRITE_BITS,
+                                MODBUS_MAX_READ_REGISTERS, MODBUS_MAX_WRITE_REGISTERS);
 
     if (*mb_mapping == NULL) {
         fprintf(stderr, "Failed to allecate mapping %s\n", modbus_strerror(errno));
         return ERROR;
     }
-    
     *socket = modbus_tcp_listen(*modb_ctx, MAX_CONNECTIONS);
     if(*socket == ERROR) {
         printf("Unable to  %s", modbus_strerror(errno));
