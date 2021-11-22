@@ -1,7 +1,7 @@
 #ifndef MODB_SERVER_H
 #include "modb_server.h"
 #endif
-
+#define DEBUG 1
 #define ERROR -1
 #define OK 0
 

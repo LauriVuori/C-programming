@@ -17,7 +17,7 @@
 
 PROJ_EXECUTABLE = main_release
 FILE_FOR_TESTING = modb_server
-C_FILES = modb_server
+C_FILES = modb_init
 # Compiler
 CC = gcc
 
@@ -51,7 +51,9 @@ win: $(OBJECTS)
 debug: $(OBJECTS)
 	gcc -g -c -I$(INCLUDE) -lmodbus src/main.c -o src/main.o 
 	gcc -g  -c -I$(INCLUDE) -lmodbus src/$(C_FILES).c -o src/$(C_FILES).o 
-	gcc -g   ./src/main.o ./src/$(C_FILES).o -o ./src/debug.out -lmodbus
+	gcc -g  -c -I$(INCLUDE) -lmodbus src/modb_incoming.c -o src/modb_incoming.o 
+	gcc -g  -c -I$(INCLUDE) -lmodbus src/modb_createdata.c -o src/modb_createdata.o 
+	gcc -g   ./src/main.o ./src/$(C_FILES).o src/modb_incoming.o src/modb_createdata.o  -o ./src/debug.out -lmodbus
 
 all: $(OBJECTS) $(PROJ_EXECUTABLE)
 

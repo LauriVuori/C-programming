@@ -20,10 +20,11 @@ int main() {
     // alkuperäinen port 502, ip 127.000.000.001
     // The modbus_new_tcp() function shall allocate 
     // and initialize a modbus_t structure to communicate with a Modbus TCP/IPv4 server.
+    printf("<%p>\n", ctx);
     ctx = modbus_new_tcp("127.000.000.001", 8080); 
 	
 	//Question 2) From where do you find the IP address and portnumber to use? 
-	
+	printf("<%p>\n", ctx);
     if (ctx == NULL) {   //Question 3) What happens here?, == jos ctx ei saa (muuten null pointer) osoitetta, ei ole luote tcp yhteyttä
     
         printf("Unable to allocate libmodbus context,%s\n", modbus_strerror(errno));

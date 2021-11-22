@@ -13,9 +13,10 @@
 
 #define DISCRETE_INPUTS 8 //Read-only
 #define COILS 8 //Read-Write
-#define INPUT_REGISTERS 0 //Read-only
-#define HOLDING_REGISTERS 0 //Read-Write
+#define INPUT_REGISTERS 8 //Read-only
+#define HOLDING_REGISTERS 8 //Read-Write
 
 int initialize(modbus_mapping_t **mb_mapping, modbus_t **modb_ctx, 
                 int * r_connectiong, int * socket, char ip_address[], uint16_t port);
-void createData();
+void incoming(uint8_t message[], modbus_t * context_ptr, int * receive_con);
+void createData(modbus_mapping_t *mb_mapping, uint8_t message[]);

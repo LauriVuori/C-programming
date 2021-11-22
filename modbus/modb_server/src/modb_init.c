@@ -4,18 +4,19 @@
 #ifndef INCLUDE_H
 #include "../include/include.h"
 #endif
+
 int initialize(modbus_mapping_t **mb_mapping, modbus_t **modb_ctx, 
                 int * r_connectiong, int * socket, char ip_address[], uint16_t port) {
     *modb_ctx = modbus_new_tcp(ip_address, port);
-    printf(CYN"<<%p>>"RESET, modb_ctx);
+
     
     if (*modb_ctx == NULL) {
         printf("Unable to allocate libmodbus context,%s\n", modbus_strerror(errno));
         return ERROR;
     }
-
-    *mb_mapping = modbus_mapping_new(MODBUS_MAX_READ_BITS, MODBUS_MAX_WRITE_BITS,
-                                MODBUS_MAX_READ_REGISTERS, MODBUS_MAX_WRITE_REGISTERS);
+    // modbus_mapping_t modbus_mapping_new(int nb_bits, int nb_input_bits, int nb_registers, int nb_input_registers);*
+    *mb_mapping = modbus_mapping_new(DISCRETE_INPUTS, COILS,
+                                INPUT_REGISTERS, HOLDING_REGISTERS);
 
     if (*mb_mapping == NULL) {
         fprintf(stderr, "Failed to allecate mapping %s\n", modbus_strerror(errno));

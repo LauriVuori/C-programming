@@ -8,3 +8,7 @@ g_lib
 # ./cov_output
 cov_output
 .old
+modbus_server_description.pdf
+a.out
+example.c
+gtest_dir_script.sh
