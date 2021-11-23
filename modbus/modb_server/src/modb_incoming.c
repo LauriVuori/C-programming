@@ -8,7 +8,7 @@
 
 // Transaction Id	    Protocol	    Length	    Unit Address	    Message
 //     2 Bytes	          2 Bytes	       2 Bytes	    1 Byte	        N Bytes
-void incoming(uint8_t received_message[], modbus_t * context_ptr, int * receive_con) {
+void incoming(uint8_t received_message[], modbus_t * context_ptr, int * receive_con, uint8_t * msg) {
     uint16_t transaction_id = 0;
     uint16_t protocol = 0;
     uint16_t lenght = 0;
@@ -20,10 +20,12 @@ void incoming(uint8_t received_message[], modbus_t * context_ptr, int * receive_
     uint16_t byte_count = 0;
     uint8_t mb_message[MODBUS_MAX_PDU_LENGTH];
     uint8_t output_bytes[100];
-
+    uint8_t header_len = 0;
+    header_len = modbus_get_header_length(context_ptr);
     *receive_con = modbus_receive(context_ptr, received_message);   //Question 9) What does modbus_receive() do?
     if (*receive_con >= 0) {
         printf(BLU"MESSAGE FRAME:\n"RESET);
+        printf(GRN"Header Lenght: <%d>\n", header_len);
         /************************************ message frame end ******************/
         transaction_id = (modbus_get_byte_from_bits(received_message, 0, 1) << 8) | (modbus_get_byte_from_bits(received_message, 1, 1));
         printf(GRN"Transaction id: <%x%x%x%x>\n"RESET, (0x0f & (transaction_id >> 12)), (0x0f & transaction_id >> 8), (0x0f & transaction_id >> 4), (0x0f & transaction_id));
@@ -110,6 +112,13 @@ void incoming(uint8_t received_message[], modbus_t * context_ptr, int * receive_
             }
             printf("\n");
             printf(BLU"MESSAGE FRAME ENDS\n"RESET);
+ 
+            
         }
+    for (int i = 0; i < 13; i++) {
+        msg[i] = modbus_get_byte_from_bits(received_message, i, 1);
+        printf("\n!%x!\n", msg[i]);
+    }
+    
     }
 }

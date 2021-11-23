@@ -19,10 +19,10 @@
 #include <errno.h>
 #include <string.h>
 #include <modbus.h>
-
 #ifndef INCLUDE_H
 #include "../include/include.h"
 #endif
+
 // The function
 // 1. sets up a modbus mapping
 // 2. calls the createData() function
@@ -33,6 +33,8 @@
 
 // void debug_print(uint8_t message[]);
 void print_maps(modbus_mapping_t *mb_mapping);
+void testing(modbus_t *ctx, const uint8_t *req,
+                 int req_length, modbus_mapping_t *mb_mapping);
 int main() {
     int socket;
     modbus_t *modb_ctx;
@@ -56,17 +58,25 @@ int main() {
     for(;;) {
         printf("\nWaiting for incoming message...\n");
         uint8_t query[MODBUS_TCP_MAX_ADU_LENGTH];
-        incoming(query, modb_ctx, &receive_con);
+        uint8_t msg[50];
+        incoming(query, modb_ctx, &receive_con, msg);
         // int a = modbus_receive(modb_ctx, query);
         if (receive_con >= 0) {
             // modbus_reply(modb_ctx, query, receive_con, mb_mapping);
+            // send_msg(modbus_t *ctx, uint8_t *msg, int msg_length);
+            // uint8_t msg[50] = {0x1,0x2,0x3,0x1,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x6,0x0,0x0,0x0,0x6,0x0,0x0,0x0,0x7,0xf,0xf,0xf,0xf};
+            // uint8_t msg[50] = {0x0,0x1,0x0,0x0,0x0,0x6,0x0,0x5,0x0,0x0,0x0,0x0};
+            for (int i = 0; i < 13; i++) {
+                printf("\n<<%x>>\n", msg[i]);
+            }
+            send_msg(modb_ctx, msg, 12);
             // createData(&mb_mapping, &modb_ctx, query);
             // print_maps(mb_mapping);
             // printf("\n--->");
             // for (int i = 0; i < 8; i++) {
             //     printf("!<%d>!", *(mb_mapping->tab_bits+i));
             // }
-            createData(mb_mapping, query);
+            // createData(mb_mapping, query);
 
         }
         else {

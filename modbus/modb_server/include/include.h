@@ -4,7 +4,7 @@
 #define DEBUG 1
 #define ERROR -1
 #define OK 0
-
+#define CREATEDATA 1
 #define RED   "\x1B[31m"
 #define GRN   "\x1B[32m"
 #define YEL   "\x1B[33m"
