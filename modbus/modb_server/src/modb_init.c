@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <modbus.h>
+#include "../modbus_lib/include/modbus/modbus.h"
 #include <errno.h>
 #ifndef INCLUDE_H
 #include "../include/include.h"

@@ -29,36 +29,40 @@ endif
 
 
 #Here we define include dir
-INCLUDE = ./include -I /usr/include/modbus/
+# INCLUDE = ./include -I /usr/include/modbus/
+INCLUDE = ./include -I./modbus_lib/include/modbus/
 SRC= ./src
 
 CFLAGS = -c -I$(INCLUDE)
-
+DEBUG_FLAGS = -g $(CFLAGS)
 OBJECTS := $(patsubst %.$(FILETYPE),%.o,$(wildcard $(SRC)/*.$(FILETYPE)))
 
-LINKS = -lmodbus
+# LINKS = -lmodbus
+LIB_FOLDER = -L./modbus_lib/lib/
+LINKS =  -lmodbus
+LD_PATH = -Wl,-rpath=./modbus_lib/lib/
 
 $(PROJ_EXECUTABLE) : $(OBJECTS)
-		$(CC) $(OBJECTS) -o $@ $(LIBS) $(LINKS)
-
-# $(CC) -g $(OBJECTS) -o main.exe $(LIBS)
-win: $(OBJECTS)
-	gcc -g -c -I./include -lpthread src/main.c -o src/main.o
-	gcc -g -c -I./include -lpthread src/ring_buffer.c -o src/ring_buffer.o
-	gcc -g ./src/main.o ./src/ring_buffer.o -o ./src/debug.exe
+		$(CC) $(LIB_FOLDER) $(LD_PATH) -I$(INCLUDE) $(OBJECTS) -o $@ $(LINKS) 
 
 
+# debug: $(OBJECTS)
+# 	gcc $(DEBUG_FLAGS) src/main.c -o src/main.o
+# 	gcc $(DEBUG_FLAGS) -lmodbus src/$(C_FILES).c -o src/$(C_FILES).o 
+# 	gcc $(DEBUG_FLAGS) -lmodbus src/modb_incoming.c -o src/modb_incoming.o 
+# 	gcc $(DEBUG_FLAGS) -lmodbus src/modb_createdata.c -o src/modb_createdata.o 
+# 	gcc -g  $(LIB_FOLDER) $(LD_PATH) -I$(INCLUDE) ./src/main.o ./src/$(C_FILES).o src/modb_incoming.o src/modb_createdata.o  -o $@ $(LINKS)
 debug: $(OBJECTS)
-	gcc -g -c -I$(INCLUDE) -lmodbus src/main.c -o src/main.o 
-	gcc -g  -c -I$(INCLUDE) -lmodbus src/$(C_FILES).c -o src/$(C_FILES).o 
-	gcc -g  -c -I$(INCLUDE) -lmodbus src/modb_incoming.c -o src/modb_incoming.o 
-	gcc -g  -c -I$(INCLUDE) -lmodbus src/modb_createdata.c -o src/modb_createdata.o 
-	gcc -g   ./src/main.o ./src/$(C_FILES).o src/modb_incoming.o src/modb_createdata.o  -o ./src/debug.out -lmodbus
+	gcc $(DEBUG_FLAGS) $(LIB_FOLDER) $(LD_PATH) -I$(INCLUDE) src/main.c -o src/main.o $(LINKS)
+	gcc $(DEBUG_FLAGS) $(LIB_FOLDER) $(LD_PATH) -I$(INCLUDE) src/$(C_FILES).c -o src/$(C_FILES).o $(LINKS)
+	gcc $(DEBUG_FLAGS) $(LIB_FOLDER) $(LD_PATH) -I$(INCLUDE) src/modb_incoming.c -o src/modb_incoming.o $(LINKS)
+	gcc $(DEBUG_FLAGS) $(LIB_FOLDER) $(LD_PATH) -I$(INCLUDE) src/modb_createdata.c -o src/modb_createdata.o $(LINKS)
+	gcc -g  $(LIB_FOLDER) $(LD_PATH) -I$(INCLUDE) ./src/main.o ./src/$(C_FILES).o src/modb_incoming.o src/modb_createdata.o  -o $@ $(LINKS)
 
 all: $(OBJECTS) $(PROJ_EXECUTABLE)
 
 .$(FILETYPE).o: *.h
-	$(CC) $(CFLAGS) $< -o $@
+	$(CC) $(CFLAGS) $< -o $@ 
 
 
 
@@ -108,7 +112,7 @@ report:
 clean:
 	-rm -f $(OBJECTS) $(PROJ_EXECUTABLE) $(TEST_DIR)/*.o $(TEST_DIR)/*.gcda $(TEST_DIR)/*.gcno unit_tests
 	-rm -f .coverage.base .coverage.run .coverage.total
-	-rm -f $(SRC)/debug.exe $(SRC)/debug.out
+	-rm -f $(SRC)/debug.exe debug
 
 clean_units:
 	-rm -f $(TEST_DIR)/*.gcda $(TEST_DIR)/*.gcno

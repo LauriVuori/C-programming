@@ -18,7 +18,7 @@
 #include <stdio.h>
 #include <errno.h>
 #include <string.h>
-#include <modbus.h>
+#include "../modbus_lib/include/modbus/modbus.h"
 #ifndef INCLUDE_H
 #include "../include/include.h"
 #endif
@@ -35,7 +35,7 @@
 void print_maps(modbus_mapping_t *mb_mapping);
 void testing(modbus_t *ctx, const uint8_t *req,
                  int req_length, modbus_mapping_t *mb_mapping);
-int main() {
+int main(void) {
     int socket;
     modbus_t *modb_ctx;
     int receive_con;
@@ -50,26 +50,37 @@ int main() {
 
     if (modbus_set_debug(modb_ctx, DEBUG) == -1) {
         printf("error setting debug");
+        return -1;
     }
     if (err == ERROR) {
         printf(RED"Init failed, program shuts down\n"RESET);
+        return -1;
     }
     printf(GRN"\nConnection established\n"RESET);
     for(;;) {
         printf("\nWaiting for incoming message...\n");
         uint8_t query[MODBUS_TCP_MAX_ADU_LENGTH];
-        uint8_t msg[50];
-        incoming(query, modb_ctx, &receive_con, msg);
+        uint8_t msg[100];
+        uint8_t msg_len = 0;
+        msg_len = incoming(query, modb_ctx, &receive_con, msg);
+        printf("\n<<<<%d>>>\n", msg_len);
         // int a = modbus_receive(modb_ctx, query);
         if (receive_con >= 0) {
-            // modbus_reply(modb_ctx, query, receive_con, mb_mapping);
+            modbus_reply(modb_ctx, query, receive_con, mb_mapping);
             // send_msg(modbus_t *ctx, uint8_t *msg, int msg_length);
             // uint8_t msg[50] = {0x1,0x2,0x3,0x1,0x0,0x0,0x0,0x0,0x0,0x0,0x0,0x6,0x0,0x0,0x0,0x6,0x0,0x0,0x0,0x7,0xf,0xf,0xf,0xf};
             // uint8_t msg[50] = {0x0,0x1,0x0,0x0,0x0,0x6,0x0,0x5,0x0,0x0,0x0,0x0};
-            for (int i = 0; i < 13; i++) {
-                printf("\n<<%x>>\n", msg[i]);
+            // uint8_t byte_count = 0;
+            // byte_count = modbus_get_byte_from_bits(query, 12, 1);
+            // for (int i = 0; i < 13; i++) {
+            //     printf("\n<<%x>>\n", msg[i]);
+            // }
+            printf("\n");
+            for (int i = 0; i < msg_len; i++) {
+                printf("<!%x!>", msg[i]);
             }
-            send_msg(modb_ctx, msg, 12);
+            printf("\n");
+            send_msg(modb_ctx, msg, msg_len);
             // createData(&mb_mapping, &modb_ctx, query);
             // print_maps(mb_mapping);
             // printf("\n--->");

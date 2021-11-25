@@ -1,5 +1,5 @@
 #include <stdio.h>
-#include <modbus.h>
+#include "../modbus_lib/include/modbus/modbus.h"
 
 #define LOCALHOST "127.0.0.1"
 #define PORT 8080
@@ -18,5 +18,5 @@
 
 int initialize(modbus_mapping_t **mb_mapping, modbus_t **modb_ctx, 
                 int * r_connectiong, int * socket, char ip_address[], uint16_t port);
-void incoming(uint8_t message[], modbus_t * context_ptr, int * receive_con, uint8_t * msg);
+int incoming(uint8_t message[], modbus_t * context_ptr, int * receive_con, uint8_t * msg);
 void createData(modbus_mapping_t *mb_mapping, uint8_t message[]);
