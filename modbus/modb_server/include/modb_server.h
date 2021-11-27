@@ -1,12 +1,13 @@
-#include <stdio.h>
 #include "../modbus_lib/include/modbus/modbus.h"
 
 #define LOCALHOST "127.0.0.1"
 #define PORT 8080
 #define MAX_CONNECTIONS 1
 
-/*modbus functions*/
-
+/*modbus debugs*/
+#define MODBUS_DATA_DEBUG 1
+#define DEBUG_MAIN 1
+#define DEBUG_MODBUS_MAPPING 1
 
 /*modbus functions end*/
 
@@ -18,5 +19,5 @@
 
 int initialize(modbus_mapping_t **mb_mapping, modbus_t **modb_ctx, 
                 int * r_connectiong, int * socket, char ip_address[], uint16_t port);
-int incoming(uint8_t message[], modbus_t * context_ptr, int * receive_con, uint8_t * msg);
-void createData(modbus_mapping_t *mb_mapping, uint8_t message[]);
+void incoming(uint8_t received_message[], modbus_t * context_ptr, int * receive_con);
+void createData(modbus_mapping_t *mb_mapping);
