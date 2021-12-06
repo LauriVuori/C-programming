@@ -1,0 +1,15 @@
+modbus kirjastoon on lisättynä kaksi funktiota
+void print_mapping_data(modbus_mapping_t *mb_mapping);
+void print_incoming_message(uint8_t received_message[], modbus_t * context_ptr);
+
+print_mapping_data tulossaa tietueen sisällön ja
+print_incoming_message tulostaa vastaan otetun viestin sisällön
+
+Makefile komennot
+    -make : luo suoritettavan tiedoston, main_release
+    -make clean: poistaa kaikki ylimääräiset tiedostot uutta käännöstä varten. Header tiedostojen
+    muokkaamisen jälkeen ainakin tulisi ajaa sillä makefile ei löydä muutoksia niihin.
+
+
+Src kansioon ja include kansioon voidaan vapaasti lisätä tiedostoja. 
+Uusia kansioita ei voida lisätä ilman makefilen muokkaamista.

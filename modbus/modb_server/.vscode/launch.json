@@ -8,7 +8,7 @@
             "name": "WSL DEBUG",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/debug",
+            "program": "${workspaceFolder}/debug.out",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${fileDirname}",

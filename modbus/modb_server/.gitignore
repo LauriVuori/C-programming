@@ -12,6 +12,8 @@ modbus_server_description.pdf
 a.out
 example.c
 gtest_dir_script.sh
-modbus_lib
+
 modbus_lib_source
 .gitignore
+modbus_lib
+.modbus_lib
