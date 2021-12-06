@@ -4,6 +4,7 @@
 #include <string.h>
 #include <unistd.h>
 
+// halutut header tiedostot lisätään tähän
 #ifndef MODB_SERVER_H
 #define MODB_SERVER_H
 #include "modb_server.h"

@@ -241,8 +241,14 @@ MODBUS_API int modbus_reply_exception(modbus_t *ctx, const uint8_t *req,
 
 #define RED   "\x1B[31m"
 #define GRN   "\x1B[32m"
+#define YEL   "\x1B[33m"
+#define BLU   "\x1B[34m"
+#define MAG   "\x1B[35m"
+#define CYN   "\x1B[36m"
+#define WHT   "\x1B[37m"
 #define RESET "\x1B[0m"
 void print_mapping_data(modbus_mapping_t *mb_mapping);
+void print_incoming_message(uint8_t received_message[], modbus_t * context_ptr);
 /**
  * UTILS FUNCTIONS
  **/
